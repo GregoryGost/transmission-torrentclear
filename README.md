@@ -1,10 +1,10 @@
 # **Transmission torrentclear application**
 
-![License](https://img.shields.io/github/license/GregoryGost/Transmission-torrentclear)
-![RepoSize](https://img.shields.io/github/repo-size/GregoryGost/Transmission-torrentclear)
-![CodeSize](https://img.shields.io/github/languages/code-size/GregoryGost/Transmission-torrentclear)
-![IssuesOpen](https://img.shields.io/github/issues-raw/GregoryGost/Transmission-torrentclear)
-![LatestRelease](https://img.shields.io/github/v/release/GregoryGost/Transmission-torrentclear)
+![License](https://img.shields.io/github/license/GregoryGost/transmission-torrentclear)
+![RepoSize](https://img.shields.io/github/repo-size/GregoryGost/transmission-torrentclear)
+![CodeSize](https://img.shields.io/github/languages/code-size/GregoryGost/transmission-torrentclear)
+![IssuesOpen](https://img.shields.io/github/issues-raw/GregoryGost/transmission-torrentclear)
+![LatestRelease](https://img.shields.io/github/v/release/GregoryGost/transmission-torrentclear)
 
 Создано в рамках статьи для блога: [Домашний Сервер: Часть 4 – Настройка Transmission daemon в контейнере LXC Proxmox-VE](https://gregory-gost.ru/domashnij-server-chast-4-nastrojka-transmission-daemon-v-kontejnere-lxc-proxmox-ve/)
 
