@@ -55,7 +55,7 @@
 
 ### **Установка**
 
-Нужно поставить NodeJS и менеджер пакетов PNPM (если Вы ставили приложение [torrentdone](https://github.com/GregoryGost/Transmission-torrentdone) то всё уже должно быть установлено)  
+Нужно поставить NodeJS и менеджер пакетов PNPM (если Вы ставили приложение [torrentdone](https://github.com/GregoryGost/transmission-torrentdone) то всё уже должно быть установлено)  
 Команды для Proxmox LXC Debian 11.5 под root
 
 ```shell
