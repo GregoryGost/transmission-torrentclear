@@ -1,0 +1,16 @@
+[Unit]
+Description=Transmission torrent clear cron worker
+After=syslog.target
+After=transmission-daemon.service
+Wants=transmission-daemon.service
+
+[Service]
+ExecStart=/usr/bin/node main.js
+WorkingDirectory=/opt/torrentclear/dist
+SyslogIdentifier=torrentclear
+Restart=on-failure
+User=root
+Group=root
+
+[Install]
+WantedBy=multi-user.target

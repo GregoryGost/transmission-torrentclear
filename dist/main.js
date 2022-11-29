@@ -1,0 +1,2 @@
+#!/usr/bin/node
+import{Config}from"./class/Config.js";import{Logger}from"./class/Logger.js";import{Torrentclear}from"./class/Torrentclear.js";const config=new Config,logger=new Logger(config.logLevel,config.logFilePath),torrentclear=new Torrentclear(config,logger);torrentclear.main();
