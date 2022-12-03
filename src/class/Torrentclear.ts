@@ -3,6 +3,7 @@ import { lstatSync, Stats } from 'node:fs';
 import { normalize, extname } from 'node:path';
 import { schedule, ScheduledTask } from 'node-cron';
 import cronParser from 'cron-parser';
+import { format } from 'fecha';
 import { Config } from './Config.js';
 import { Logger } from './Logger.js';
 
@@ -32,7 +33,7 @@ interface TorrentInfoI {
    */
   dateDone: string;
   /**
-   * Date difference. Now date - torrent date
+   * Date difference. Now date - torrent date.
    * Example: `123456` (seconds)
    */
   dateDifference: number;
@@ -40,20 +41,20 @@ interface TorrentInfoI {
 
 class Torrentclear {
   /**
-   * Config instance object
+   * Config instance object.
    */
   private readonly config: Config;
   /**
-   * Logger instance object
+   * Logger instance object.
    */
   private readonly logger: Logger;
   /**
-   * Connect commant for transmission-remote
+   * Connect commant for transmission-remote.
    * Example: transmission-remote 127.0.0.1:9091 -n login:password
    */
   private readonly connect: string;
   /**
-   * transmission-remote result success
+   * transmission-remote result success.
    * Example: 127.0.0.1:9091/transmission/rpc/ responded: "success"
    */
   private readonly regexSuccess = /success/i;
@@ -64,29 +65,17 @@ class Torrentclear {
     this.connect = this.connectCommandCreate();
   }
 
+  /**
+   * Main function. Start program.
+   */
   public main(): void {
     this.cronInit();
   }
 
-  // public async main(): Promise<void> {
-  //   try {
-  //     this.logger.info(
-  //       '##############################################################################################'
-  //     );
-  //     await this.clearProcess();
-  //     this.logger.info(
-  //       '##############################################################################################\n'
-  //     );
-  //   } catch (error) {
-  //     if (this.config.devmode) this.logger.trace(error.message, error.stack);
-  //     else this.logger.error(error.message);
-  //     this.logger.info(
-  //       '##############################################################################################\n'
-  //     );
-  //   }
-  // }
-
-  // For single run test
+  /**
+   * Base function. Start clear process for torrents.
+   * It is possible to run single tests without cron jobs.
+   */
   public async clearProcess(): Promise<void> {
     try {
       const ids: string[] = this.getIDs();
@@ -96,6 +85,9 @@ class Torrentclear {
     }
   }
 
+  /**
+   * Init cron task. Start cron task.
+   */
   private cronInit(): void {
     this.logger.info('##############################################################################################');
     this.logger.info(`NodeCron task "${this.config.cronExpression}" SETUP`);
@@ -106,7 +98,7 @@ class Torrentclear {
         try {
           await this.clearProcess();
           const interval: cronParser.CronExpression = cronParser.parseExpression(this.config.cronExpression);
-          const nextTickDate: string = Torrentclear.dateFormat(Date.parse(interval.next().toString()));
+          const nextTickDate: string = this.dateFormat(Date.parse(interval.next().toString()));
           this.logger.info(`NodeCron task "${this.config.cronExpression}" END. Next tick [${nextTickDate}]`);
           this.logger.info(
             '##############################################################################################\n'
@@ -125,12 +117,16 @@ class Torrentclear {
       }
     );
     const interval: cronParser.CronExpression = cronParser.parseExpression(this.config.cronExpression);
-    const nextTickDate: string = Torrentclear.dateFormat(Date.parse(interval.next().toString()));
+    const nextTickDate: string = this.dateFormat(Date.parse(interval.next().toString()));
     this.logger.info(`NodeCron task START at [${nextTickDate}]`);
     this.logger.info('##############################################################################################');
     task.start();
   }
 
+  /**
+   * Get all torrents id from transmission.
+   * @returns `ids` IDs array list
+   */
   private getIDs(): string[] {
     // List all torrents
     const command = `${this.connect} -l`;
@@ -156,6 +152,10 @@ class Torrentclear {
     return ids;
   }
 
+  /**
+   * Checking torrents. If the deletion conditions match, then the torrent is deleted.
+   * @param ids IDs array list
+   */
   private async checkTorrents(ids: string[]): Promise<void> {
     try {
       if (ids.length > 0) {
@@ -209,9 +209,14 @@ class Torrentclear {
     }
   }
 
+  /**
+   * Stop and Remove torrent (but before checkFileorDirectory check)
+   * @param id - Torrent ID
+   * @param torrent_info - Torrent info data (interface TorrentInfoI)
+   */
   private async delete(id: string, torrent_info: TorrentInfoI): Promise<void> {
+    // STOP and REMOVE torrent from Transmission
     try {
-      // STOP and REMOVE torrent from Transmission
       this.torrentStop(id, torrent_info.name);
       // Check torrent is File or Directory
       await this.checkFileOrDirectory(id, torrent_info);
@@ -220,6 +225,12 @@ class Torrentclear {
     }
   }
 
+  /**
+   * Check torrent is a File or a Directory.
+   * If is a File check extensions (mkv, avi, mp4 defaults)
+   * @param id - Torrent ID
+   * @param torrent_info - Torrent info data (interface TorrentInfoI)
+   */
   private async checkFileOrDirectory(id: string, torrent_info: TorrentInfoI): Promise<void> {
     try {
       const torrentPath: string = normalize(`${torrent_info.location}/${torrent_info.name}`);
@@ -255,6 +266,11 @@ class Torrentclear {
     }
   }
 
+  /**
+   * Stop torrent command execution.
+   * @param id - Torrent ID
+   * @param name - Torrent name
+   */
   private torrentStop(id: string, name: string): void {
     const command = `${this.connect} -t ${id} -S`;
     this.logger.debug(`Stop torrent: (${id}) "${name}"`);
@@ -268,6 +284,12 @@ class Torrentclear {
     }
   }
 
+  /**
+   * Remove torrent command execution.
+   * DOES NOT DELETE FILES (removes only from the transmission)
+   * @param id - Torrent ID
+   * @param name - Torrent name
+   */
   private async torrentRemove(id: string, name: string): Promise<void> {
     try {
       const command = `${this.connect} -t ${id} -r`;
@@ -285,6 +307,12 @@ class Torrentclear {
     }
   }
 
+  /**
+   * Remove torrent command execution.
+   * DELETES INCLUDING ALL TORRENT FILES
+   * @param id - Torrent ID
+   * @param name - Torrent name
+   */
   private async torrentRemoveAndDelete(id: string, name: string): Promise<void> {
     try {
       const command = `${this.connect} -t ${id} --remove-and-delete`;
@@ -302,6 +330,12 @@ class Torrentclear {
     }
   }
 
+  /**
+   * Check ratio torrent.
+   * Config ratio obtained from the transmission configuration file `settings.json`
+   * @param ratio - Torrent Ratio
+   * @returns (`true` or `false`) torrent ratio equal or greater
+   */
   private checkRatio(ratio: number): boolean {
     if (ratio >= this.config.ratioLimit) {
       this.logger.info(`Torrent has reached the Ratio limit: "${ratio}" >= "${this.config.ratioLimit}"`);
@@ -310,6 +344,12 @@ class Torrentclear {
     return false;
   }
 
+  /**
+   * Check torrent date difference.
+   * The date difference limit is set in the configuration file of this application
+   * @param date_difference - Torrent difference date (now date - torrent end date)
+   * @returns (`true` or `false`) torrent date equal or greater
+   */
   private checkDateDifference(date_difference: number): boolean {
     if (date_difference >= this.config.limitTime) {
       this.logger.info(
@@ -320,6 +360,11 @@ class Torrentclear {
     return false;
   }
 
+  /**
+   * Getting the necessary information about the torrent with a separate command.
+   * @param id - Torrent ID
+   * @returns `object<TorrentInfoI>` - Torrent info object
+   */
   private async getTorrentInfo(id: string): Promise<TorrentInfoI> {
     try {
       const command = `${this.connect} -t ${id} -i`;
@@ -341,7 +386,7 @@ class Torrentclear {
         location: match[2][6],
         percent: Number(match[3][3]),
         ratio: Number(match[4][4]),
-        dateDone: Torrentclear.dateFormat(dateDone),
+        dateDone: this.dateFormat(dateDone),
         dateDifference: Math.round((nowDate - dateDone) / 1000),
       };
       this.logger.debug(`Torrent ID "${id}" info:`);
@@ -358,8 +403,25 @@ class Torrentclear {
     }
   }
 
+  /**
+   * Basic constructor for creating a command to connect to a transmission-remote.
+   * Example: `transmission-remote 127.0.0.1:9091 -n login:password`
+   * @returns connect command
+   */
   private connectCommandCreate(): string {
     return `transmission-remote ${this.config.ipAddress}:${this.config.port} -n ${this.config.login}:${this.config.password}`;
+  }
+
+  /**
+   * Format timestamp to a human date format.
+   * Formatted string accepted by the [fecha](https://github.com/taylorhakes/fecha) module
+   * @param {number} timestamp Unix timestamp
+   * @returns {string} Formatted date string (Example: DD.MM.YYYY HH:mm:ss => 03.12.2022 22:44:15)
+   */
+  private dateFormat(timestamp: number): string {
+    const date: Date = new Date(timestamp);
+    const formattedDate: string = format(date, this.config.dateFormat);
+    return formattedDate;
   }
 
   /**
@@ -372,20 +434,14 @@ class Torrentclear {
     return Intl.DateTimeFormat().resolvedOptions().timeZone;
   }
 
+  /**
+   * [Static]
+   * Execution connect command to a transmission-remote.
+   * @param command - Command to a connect
+   * @returns Execution result
+   */
   private static command(command: string): string {
     return execSync(command, { timeout: 2000, encoding: 'utf8' });
-  }
-
-  private static dateFormat(timestamp: number): string {
-    const date: Date = new Date(timestamp);
-    const day: number | string = date.getDate() > 9 ? date.getDate() : '0' + date.getDate();
-    const mounthReal: number = date.getMonth() + 1;
-    const mounth: number | string = mounthReal > 9 ? mounthReal : '0' + mounthReal;
-    const year: number = date.getFullYear();
-    const hours: number | string = date.getHours() > 9 ? date.getHours() : '0' + date.getHours();
-    const minutes: number | string = date.getMinutes() > 9 ? date.getMinutes() : '0' + date.getMinutes();
-    const seconds: number | string = date.getSeconds() > 9 ? date.getSeconds() : '0' + date.getSeconds();
-    return `${day}.${mounth}.${year} ${hours}:${minutes}:${seconds}`;
   }
 
   /**

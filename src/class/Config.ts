@@ -15,37 +15,38 @@ class Config {
   /**
    * Development mode status
    * if development = true
-   * Default: development
+   * Default: `development`
    */
   public readonly devmode: boolean;
   /**
    * Log level
    * if devmode(true) = trace
    * trace | debug | info | warn | error
-   * Default: info
+   * Default: `info`
    */
   public readonly logLevel: string;
   /**
-   * Log date and time format (winston)
-   * Default DD.MM.YYYY HH:mm:ss
+   * Date and time format. Used in winston and application.
+   * Formatted string accepted by the [fecha](https://github.com/taylorhakes/fecha) module.
+   * Default: `DD.MM.YYYY HH:mm:ss`
    */
-  public readonly logDateFormat: string;
+  public readonly dateFormat: string;
   //
   // TRANSMISSION SETTINGS
   //
   /**
    * Torrent done log file path
-   * Default: /var/log/transmission/torrentclear.log
+   * Default: `/var/log/transmission/torrentclear.log`
    */
   public readonly logFilePath: string;
   /**
    * Transmission-daemon IP Address
-   * Default: 127.0.0.1 (localhost)
+   * Default: `127.0.0.1` (localhost)
    */
   public readonly ipAddress: string;
   /**
    * Transmission-daemon TCP Port
-   * Default: 9091
+   * Default: `9091`
    */
   public readonly port: number;
   /**
@@ -59,7 +60,7 @@ class Config {
   /**
    * Torrent limit time
    * After how many days should the torrent be deleted even if it has not reached the distribution coefficient = 2
-   * Default: 604800 sec (7 days)
+   * Default: `604800` sec (7 days)
    */
   public readonly limitTime: number;
   /**
@@ -76,7 +77,7 @@ class Config {
    * │ │ │ │ │ │
    * │ │ │ │ │ │
    * * * * * * *
-   * Default: 0 * * * * (every hour)
+   * Default: `0 * * * *` (every hour)
    */
   public readonly cronExpression: string;
   /**
@@ -92,7 +93,7 @@ class Config {
   public ratioLimit = 2;
   /**
    * Allowed extensions for media files
-   * Default: mkv, mp4, avi
+   * Default: `mkv,mp4,avi`
    */
   public readonly allowedMediaExtensions: RegExp;
 
@@ -102,7 +103,7 @@ class Config {
     this.password = Config.getParam('password');
     this.devmode = Config.getParam('node_env') === 'development';
     this.logLevel = this.devmode ? 'trace' : Config.getParam('log_level');
-    this.logDateFormat = Config.getParam('log_date_format');
+    this.dateFormat = Config.getParam('date_format');
     this.logFilePath = Config.getParam('log_file_path');
     this.ipAddress = Config.getParam('ip_address');
     this.port = Number(Config.getParam('tcp_port'));
@@ -124,7 +125,7 @@ class Config {
       node_env: 'production',
       log_level: 'info',
       log_file_path: '/var/log/transmission/torrentclear.log',
-      log_date_format: 'DD.MM.YYYY HH:mm:ss',
+      date_format: 'DD.MM.YYYY HH:mm:ss',
       ip_address: '127.0.0.1',
       tcp_port: '9091',
       limit_time: '604800',

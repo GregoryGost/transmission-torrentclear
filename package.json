@@ -53,6 +53,7 @@
   },
   "dependencies": {
     "cron-parser": "4.7.0",
+    "fecha": "4.2.3",
     "nconf": "0.12.0",
     "node-cron": "3.0.2",
     "winston": "3.8.2"

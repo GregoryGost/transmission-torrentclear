@@ -125,7 +125,7 @@ nano /opt/torrentclear/dist/config.json
 - `node_env` - Режим использования приложения. Задать `development` если режим разработки. Default: `production`
 - `log_level` - Уровень логирования. Default: `info`. Для режима разработки `trace`
 - `log_file_path` - Путь до файла сохранения логов. Default: `/var/log/transmission/torrentdone.log`
-- `log_date_format` - Формат вывода даты в логе. Default: `DD.MM.YYYY HH:mm:ss` Example: 12.11.2022 21:54:03
+- `date_format` - Формат вывода даты в логе и в приложении. Для форматирования используется пакет [fecha](https://github.com/taylorhakes/fecha) Default: `DD.MM.YYYY HH:mm:ss` Example: 12.11.2022 21:54:03
 - `ip_address` - IP адрес для доступа к transmission. Default: `127.0.0.1`
 - `tcp_port` - TCP порт для доступа к transmission. Default: `9091`
 - `limit_time` - Разница во времени (в секундах) по которому файл удаляется если не достигнут RATIO (второе условие). Default: `604800` (7 дней)

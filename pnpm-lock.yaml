@@ -10,11 +10,12 @@ specifiers:
   '@types/pump': 1.1.1
   '@typescript-eslint/eslint-plugin': 5.42.0
   '@typescript-eslint/parser': 5.42.0
-  cron-parser: ^4.7.0
+  cron-parser: 4.7.0
   eslint: 8.26.0
   eslint-config-prettier: 8.5.0
   eslint-plugin-import: 2.26.0
   eslint-plugin-prettier: 4.2.1
+  fecha: ^4.2.3
   gulp: 4.0.2
   gulp-typescript: 6.0.0-alpha.1
   gulp-uglify: 3.0.2
@@ -30,6 +31,7 @@ specifiers:
 
 dependencies:
   cron-parser: 4.7.0
+  fecha: 4.2.3
   nconf: 0.12.0
   node-cron: 3.0.2
   winston: 3.8.2

@@ -6,7 +6,7 @@ import { Torrentclear } from '../src/class/Torrentclear';
 
 const configFile: string = normalize(`${cwd()}/config.json`);
 const config: Config = new Config(configFile);
-const logger: Logger = new Logger(config.logLevel, config.logFilePath);
+const logger: Logger = new Logger(config.logLevel, config.logFilePath, config.dateFormat);
 
 test('Torrentclear class instance and init params', () => {
   const torrentclear: Torrentclear = new Torrentclear(config, logger);
