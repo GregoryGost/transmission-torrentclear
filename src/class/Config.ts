@@ -1,4 +1,5 @@
-import { normalize } from 'node:path';
+import { normalize, dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { existsSync } from 'node:fs';
 import nconf from 'nconf';
 import { validate } from 'node-cron';
@@ -11,7 +12,7 @@ class Config {
   /**
    * Path to root application dir
    */
-  private readonly rootPath: string = process.cwd();
+  private readonly rootPath: string = normalize(join(dirname(fileURLToPath(import.meta.url)), '../..'));
   /**
    * Development mode status
    * if development = true
@@ -116,7 +117,6 @@ class Config {
   }
 
   private init(config_file_path?: string): void {
-    // .../dist/config.json
     let configFile = normalize(`${this.rootPath}/config.json`);
     if (config_file_path !== undefined) configFile = config_file_path;
     nconf.env();

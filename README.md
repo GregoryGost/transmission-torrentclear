@@ -103,7 +103,7 @@ chmod +x torrentclear/dist/main.js
 Создаем файл настроек и задаем свои параметры
 
 ```shell
-nano /opt/torrentclear/dist/config.json
+nano /opt/torrentclear/config.json
 ```
 
 ```json
