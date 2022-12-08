@@ -125,7 +125,7 @@ nano /opt/torrentclear/config.json
 - `node_env` - Режим использования приложения. Задать `development` если режим разработки. Default: `production`
 - `log_level` - Уровень логирования. Default: `info`. Для режима разработки `trace`
 - `log_file_path` - Путь до файла сохранения логов. Default: `/var/log/transmission/torrentdone.log`
-- `date_format` - Формат вывода даты в логе и в приложении. Для форматирования используется пакет [fecha](https://github.com/taylorhakes/fecha) Default: `DD.MM.YYYY HH:mm:ss` Example: 12.11.2022 21:54:03
+- `date_format` - Формат вывода даты в логе и в приложении. Для форматирования используется модуль [fecha](https://github.com/taylorhakes/fecha) Default: `DD.MM.YYYY HH:mm:ss` Example: 12.11.2022 21:54:03
 - `ip_address` - IP адрес для доступа к transmission. Default: `127.0.0.1`
 - `tcp_port` - TCP порт для доступа к transmission. Default: `9091`
 - `limit_time` - Разница во времени (в секундах) по которому файл удаляется если не достигнут RATIO (второе условие). Default: `604800` (7 дней)
@@ -133,7 +133,7 @@ nano /opt/torrentclear/config.json
 - `cron_expression` - Период запуска в формате [CRON](https://crontab.cronhub.io/). Default: `0 * * * *` (каждый час)
 - `allowed_media_extensions` - Расширения файлов перечисленные через запятую для которых осуществляется обработка. Default: `mkv,mp4,avi`
 
-Устанавливаем приложение как сервис systemd
+Устанавливаем приложение как сервис systemd и ставим его в автозапуск
 
 ```shell
 cp /opt/torrentclear/torrentclear.service /etc/systemd/system/
