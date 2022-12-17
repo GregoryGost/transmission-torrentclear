@@ -1,11 +1,13 @@
 {
+  "clearMocks": true,
   "preset": "ts-jest/presets/default-esm",
   "roots": ["./"],
   "testEnvironment": "node",
   "transform": {
-    "^.+\\.ts?$": "ts-jest"
+    "^.+\\.ts?$": ["ts-jest", { "tsconfig": "./tsconfig.json" }]
   },
   "transformIgnorePatterns": ["./node_modules/", "./dist/"],
+  "extensionsToTreatAsEsm": [".ts"],
   "coverageThreshold": {
     "global": {
       "branches": 90,

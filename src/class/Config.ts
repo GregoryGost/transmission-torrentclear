@@ -2,7 +2,6 @@ import { normalize, dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { existsSync } from 'node:fs';
 import nconf from 'nconf';
-import { validate } from 'node-cron';
 
 /**
  * Config class
@@ -69,19 +68,6 @@ class Config {
    */
   public readonly settingsFilePath: string;
   /**
-   * ┌────────────── second (optional)
-   * │ ┌──────────── minute
-   * │ │ ┌────────── hour
-   * │ │ │ ┌──────── day of month
-   * │ │ │ │ ┌────── month
-   * │ │ │ │ │ ┌──── day of week
-   * │ │ │ │ │ │
-   * │ │ │ │ │ │
-   * * * * * * *
-   * Default: `0 * * * *` (every hour)
-   */
-  public readonly cronExpression: string;
-  /**
    * Transmission setting "ratio-limit-enabled"
    * `"ratio-limit-enabled": true`
    */
@@ -110,10 +96,8 @@ class Config {
     this.port = Number(Config.getParam('tcp_port'));
     this.limitTime = Number(Config.getParam('limit_time'));
     this.settingsFilePath = Config.getParam('settings_file_path');
-    this.cronExpression = Config.getParam('cron_expression');
     this.allowedMediaExtensions = Config.extensionsRegexTemplate(Config.getParam('allowed_media_extensions'));
     this.setRatio();
-    this.cronExpressionValidate();
   }
 
   private init(config_file_path?: string): void {
@@ -144,11 +128,6 @@ class Config {
   private setRatio(): void {
     this.ratioEnabled = Boolean(Config.getParam('ratio-limit-enabled'));
     if (this.ratioEnabled) this.ratioLimit = Number(Config.getParam('ratio-limit'));
-  }
-
-  private cronExpressionValidate(): void {
-    const expressionStatus = validate(this.cronExpression);
-    if (!expressionStatus) throw new Error(`Cron expression "${this.cronExpression}" is invalid`);
   }
 
   /**

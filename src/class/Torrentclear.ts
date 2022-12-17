@@ -1,8 +1,6 @@
 import { execSync } from 'node:child_process';
 import { lstatSync, Stats } from 'node:fs';
 import { normalize, extname } from 'node:path';
-import { schedule, ScheduledTask } from 'node-cron';
-import cronParser from 'cron-parser';
 import { format } from 'fecha';
 import { Config } from './Config.js';
 import { Logger } from './Logger.js';
@@ -87,8 +85,16 @@ class Torrentclear {
   /**
    * Main function. Start program.
    */
-  public main(): void {
-    this.cronInit();
+  public async main(): Promise<void> {
+    try {
+      this.startInfo();
+      await this.clearProcess();
+      this.endInfo();
+    } catch (error) {
+      if (this.config.devmode) this.logger.trace(error.message, error.stack);
+      else this.logger.error(error.message);
+      this.endInfo(true);
+    }
   }
 
   /**
@@ -105,77 +111,24 @@ class Torrentclear {
   }
 
   /**
-   * Cron init start delimeter
+   * Terminating delimiter output
    */
-  private cronInitStartInfo(): void {
+  private startInfo(): void {
     this.logger.info('##############################################################################################');
     this.logger.info(`transmission-torrentclear 2.0.0`);
-    this.logger.info(`NodeCron init start ...`);
-  }
-
-  /**
-   * Cron init end delimeter
-   */
-  private cronInitEndInfo(): void {
-    const interval: cronParser.CronExpression = cronParser.parseExpression(this.config.cronExpression);
-    const nextTickDate: string = this.dateFormat(Date.parse(interval.next().toString()));
-    this.logger.info(`NodeCron init "${this.config.cronExpression}" success. Start from "${nextTickDate}"`);
-    this.logger.info(
-      '##############################################################################################\n'
-    );
-  }
-
-  /**
-   * Terminating delimiter output
-   */
-  private taskStartInfo(): void {
     this.logger.info('==============================================================================================');
   }
 
   /**
    * Terminating delimiter output
    */
-  private taskEndInfo(error_flag = false): void {
-    const interval: cronParser.CronExpression = cronParser.parseExpression(this.config.cronExpression);
-    const nextTickDate: string = this.dateFormat(Date.parse(interval.next().toString()));
-    //
+  private endInfo(error_flag = false): void {
     this.logger.info('==============================================================================================');
-    //
-    if (error_flag) this.logger.error(`TORRENT: "${this.torrentInfo.name}" ERROR CLEAN PROCESS`);
-    else this.logger.info(`TORRENT: "${this.torrentInfo.name}" END CLEAN PROCESS`);
-    this.logger.info(`Next tick "${nextTickDate}"`);
-    //
+    if (error_flag) this.logger.error(`Failed to complete torrent verification process`);
+    else this.logger.info(`Completing the torrent verification process`);
     this.logger.info(
       '##############################################################################################\n'
     );
-  }
-
-  /**
-   * Init cron task. Start cron task.
-   */
-  private cronInit(): void {
-    this.cronInitStartInfo();
-    // Create cron task
-    const task: ScheduledTask = schedule(
-      this.config.cronExpression,
-      async () => {
-        try {
-          this.taskStartInfo();
-          await this.clearProcess();
-          this.taskEndInfo();
-        } catch (error) {
-          if (this.config.devmode) this.logger.trace(error.message, error.stack);
-          else this.logger.error(error.message);
-          this.taskEndInfo(true);
-        }
-      },
-      {
-        scheduled: false,
-        timezone: Torrentclear.getTimeZone(),
-      }
-    );
-    this.cronInitEndInfo();
-    task.start();
   }
 
   /**
@@ -249,17 +202,11 @@ class Torrentclear {
               } else {
                 // NO ACTION
                 this.logger.info(`NO ACTION NEEDED`);
-                this.logger.info(
-                  '=============================================================================================='
-                );
               }
             }
           } else {
             // NO ACTION
             this.logger.info(`NO ACTION NEEDED`);
-            this.logger.info(
-              '=============================================================================================='
-            );
           }
         }
       }

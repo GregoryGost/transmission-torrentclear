@@ -8,4 +8,8 @@ const config: Config = new Config();
 const logger: Logger = new Logger(config.logLevel, config.logFilePath, config.dateFormat);
 const torrentclear: Torrentclear = new Torrentclear(config, logger);
 
-torrentclear.main();
+async function run(): Promise<void> {
+  await torrentclear.main();
+}
+
+run();
