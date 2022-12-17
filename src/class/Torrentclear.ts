@@ -138,7 +138,7 @@ class Torrentclear {
   private async getIDs(): Promise<string[]> {
     try {
       // List all torrents
-      const command = `${this.connect} -l`;
+      const command = `${this.connect} --list`;
       this.logger.debug(`Run command: "${command}"`);
       const execResult: string = await Torrentclear.command(command);
       const resultArray = execResult.toString().split(/\r\n|\r|\n/gm);
@@ -273,7 +273,7 @@ class Torrentclear {
    */
   private async torrentStop(): Promise<void> {
     try {
-      const command = `${this.connect} -t ${this.torrentInfo.id} -S`;
+      const command = `${this.connect} --torrent ${this.torrentInfo.id} --stop`;
       this.logger.debug(`Stop torrent: (${this.torrentInfo.id}) "${this.torrentInfo.name}"`);
       this.logger.debug(`Run command: "${command}"`);
       let execResultStop: string = await Torrentclear.command(command);
@@ -295,7 +295,7 @@ class Torrentclear {
    */
   private async torrentRemove(): Promise<void> {
     try {
-      const command = `${this.connect} -t ${this.torrentInfo.id} -r`;
+      const command = `${this.connect} --torrent ${this.torrentInfo.id} --remove`;
       this.logger.debug(`Remove torrent without deleting file: (${this.torrentInfo.id}) "${this.torrentInfo.name}"`);
       this.logger.debug(`Run command: "${command}"`);
       let execResult: string = await Torrentclear.command(command);
@@ -317,7 +317,7 @@ class Torrentclear {
    */
   private async torrentRemoveAndDelete(): Promise<void> {
     try {
-      const command = `${this.connect} -t ${this.torrentInfo.id} --remove-and-delete`;
+      const command = `${this.connect} --torrent ${this.torrentInfo.id} --remove-and-delete`;
       this.logger.debug(`Remove torrent with deleting file: (${this.torrentInfo.id}) "${this.torrentInfo.name}"`);
       this.logger.debug(`Run command: "${command}"`);
       let execResult: string = await Torrentclear.command(command);
@@ -370,7 +370,7 @@ class Torrentclear {
    */
   private async getTorrentInfo(id: string): Promise<void> {
     try {
-      const command = `${this.connect} -t ${id} -i`;
+      const command = `${this.connect} --torrent ${id} --info`;
       this.logger.debug(`Run command: "${command}"`);
       const execResult: string = await Torrentclear.command(command);
       const matchAll = execResult
@@ -421,7 +421,7 @@ class Torrentclear {
    * @returns connect command
    */
   private connectCommandCreate(): string {
-    return `transmission-remote ${this.config.ipAddress}:${this.config.port} -n ${this.config.login}:${this.config.password}`;
+    return `transmission-remote ${this.config.ipAddress}:${this.config.port} --auth ${this.config.login}:${this.config.password}`;
   }
 
   /**
@@ -434,16 +434,6 @@ class Torrentclear {
     const date: Date = new Date(timestamp);
     const formattedDate: string = format(date, this.config.dateFormat);
     return formattedDate;
-  }
-
-  /**
-   * [Static]
-   * Get system timezone / Debian: dpkg-reconfigure tzdata
-   * Example: Europe/Moscow
-   * @returns `timezone`
-   */
-  private static getTimeZone(): string {
-    return Intl.DateTimeFormat().resolvedOptions().timeZone;
   }
 
   /**
