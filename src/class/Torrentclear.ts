@@ -115,7 +115,7 @@ class Torrentclear {
    */
   private startInfo(): void {
     this.logger.info('##############################################################################################');
-    this.logger.info(`transmission-torrentclear 2.0.0`);
+    this.logger.info(`transmission-torrentclear "${this.config.appVersion}"`);
     this.logger.info('==============================================================================================');
   }
 

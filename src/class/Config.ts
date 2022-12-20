@@ -13,11 +13,20 @@ class Config {
    */
   private readonly rootPath: string = normalize(join(dirname(fileURLToPath(import.meta.url)), '../..'));
   /**
+   * Nconf implements
+   */
+  public readonly nconf: typeof nconf = nconf;
+  /**
    * Development mode status
    * if development = true
    * Default: `development`
    */
   public readonly devmode: boolean;
+  /**
+   * This Application version
+   * Read from base file package.json
+   */
+  public readonly appVersion: string;
   /**
    * Log level
    * if devmode(true) = trace
@@ -86,26 +95,33 @@ class Config {
 
   constructor(config_file_path?: string) {
     this.init(config_file_path);
-    this.login = Config.getParam('login');
-    this.password = Config.getParam('password');
-    this.devmode = Config.getParam('node_env') === 'development';
-    this.logLevel = this.devmode ? 'trace' : Config.getParam('log_level');
-    this.dateFormat = Config.getParam('date_format');
-    this.logFilePath = Config.getParam('log_file_path');
-    this.ipAddress = Config.getParam('ip_address');
-    this.port = Number(Config.getParam('tcp_port'));
-    this.limitTime = Number(Config.getParam('limit_time'));
-    this.settingsFilePath = Config.getParam('settings_file_path');
-    this.allowedMediaExtensions = Config.extensionsRegexTemplate(Config.getParam('allowed_media_extensions'));
+    this.login = this.getParam('login');
+    this.password = this.getParam('password');
+    this.devmode = this.getParam('node_env') === 'development';
+    this.appVersion = this.getParam('version');
+    this.logLevel = this.devmode ? 'trace' : this.getParam('log_level');
+    this.dateFormat = this.getParam('date_format');
+    this.logFilePath = this.getParam('log_file_path');
+    this.ipAddress = this.getParam('ip_address');
+    this.port = Number(this.getParam('tcp_port'));
+    this.limitTime = Number(this.getParam('limit_time'));
+    this.settingsFilePath = this.getParam('settings_file_path');
+    this.allowedMediaExtensions = Config.extensionsRegexTemplate(this.getParam('allowed_media_extensions'));
     this.setRatio();
   }
 
+  /**
+   * Config base init.
+   * Load params from `config.json`, `package.json`, `settings.json` from transmission and Environment
+   * @param config_file_path - optional `config.json` file path
+   */
   private init(config_file_path?: string): void {
     let configFile = normalize(`${this.rootPath}/config.json`);
     if (config_file_path !== undefined) configFile = config_file_path;
-    nconf.env();
-    nconf.file('config', configFile);
-    nconf.defaults({
+    this.nconf.env();
+    this.nconf.file('config', configFile);
+    this.nconf.file('package', normalize(`${this.rootPath}/package.json`));
+    this.nconf.defaults({
       node_env: 'production',
       log_level: 'info',
       log_file_path: '/var/log/transmission/torrentclear.log',
@@ -117,45 +133,62 @@ class Config {
       cron_expression: '0 * * * *',
       allowed_media_extensions: 'mkv,mp4,avi',
     });
-    nconf.load();
-    Config.check();
-    Config.settingsFileExists();
-    const settingFile: string = normalize(Config.getParam('settings_file_path'));
-    nconf.file('transmission', settingFile);
-    nconf.load();
-  }
-
-  private setRatio(): void {
-    this.ratioEnabled = Boolean(Config.getParam('ratio-limit-enabled'));
-    if (this.ratioEnabled) this.ratioLimit = Number(Config.getParam('ratio-limit'));
+    this.nconf.load();
+    this.check();
+    this.settingsFileExists();
+    const settingFile: string = normalize(this.getParam('settings_file_path'));
+    this.nconf.file('transmission', settingFile);
+    this.nconf.load();
   }
 
   /**
-   * Static check login or password not found
+   * Get Ratio from `settings.json` transmission settings file
    */
-  private static check(): void {
-    const login: string = Config.getParam('login');
-    const password: string = Config.getParam('password');
+  private setRatio(): void {
+    this.ratioEnabled = Boolean(this.getParam('ratio-limit-enabled'));
+    if (this.ratioEnabled) this.ratioLimit = Number(this.getParam('ratio-limit'));
+  }
+
+  /**
+   * Check login or password not found
+   */
+  private check(): void {
+    const login: string = this.getParam('login');
+    const password: string = this.getParam('password');
     if (login === undefined || password === undefined) {
       throw new Error('Login or password must be filled in config file or Environment');
     }
   }
 
-  private static getParam(param_name: string): string {
+  /**
+   * Get param value
+   * @param param_name - parameter name
+   * @returns parameter value
+   */
+  private getParam(param_name: string): string {
     // From config file. Example: login | log_level
-    let param = nconf.get(param_name);
+    let param = this.nconf.get(param_name);
     // Else not found from config file, get from Environment (uppercase).
     // Example: LOGIN | LOG_LEVEL
-    if (param === undefined) param = nconf.get(param_name.toUpperCase());
+    if (param === undefined) param = this.nconf.get(param_name.toUpperCase());
     return param;
   }
 
-  private static settingsFileExists(): void {
-    const settingsFilePath: string = normalize(Config.getParam('settings_file_path'));
+  /**
+   * Check exists transmission `settings.json` file
+   */
+  private settingsFileExists(): void {
+    const settingsFilePath: string = normalize(this.getParam('settings_file_path'));
     if (!existsSync(settingsFilePath))
       throw new Error(`Transmission settings file not found on path ${settingsFilePath}`);
   }
 
+  /**
+   * [Static]
+   * Allowed media files extensions regex constructor
+   * @param allowed_media_extensions - comma separated list of extensions. Example: `mkv,mp4,avi`
+   * @returns RegExp object (new RegExp)
+   */
   private static extensionsRegexTemplate(allowed_media_extensions: string): RegExp {
     const extensionArray: string[] = allowed_media_extensions.split(',');
     let regexString = `\.(`;
