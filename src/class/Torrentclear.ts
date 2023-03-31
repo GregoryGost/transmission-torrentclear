@@ -65,6 +65,10 @@ class Torrentclear {
    * Implement interface TorrentInfoI
    */
   private torrentInfo: TorrentInfoI;
+  /**
+   * ENUM for Check torrent is file or directory
+   */
+  private fileOrDirsState = { FILE: 1, DIR: 2, NOTFOUND: 3, UNKNOWN: 4 };
 
   constructor(config: Config, logger: Logger) {
     this.config = config;
@@ -91,6 +95,8 @@ class Torrentclear {
       await this.clearProcess();
       this.endInfo();
     } catch (error) {
+      this.logger.debug(`Error code: ${error.code}`);
+      this.logger.debug(`Error message: ${error.message}`);
       if (this.config.devmode) this.logger.trace(error.message, error.stack);
       else this.logger.error(error.message);
       this.endInfo(true);
@@ -236,8 +242,9 @@ class Torrentclear {
   private async checkFileOrDirectory(): Promise<void> {
     try {
       const torrentPath: string = normalize(`${this.torrentInfo.location}/${this.torrentInfo.name}`);
-      const fileOrDir: boolean | undefined = await Torrentclear.isFileOrDirectoryOrUnknown(torrentPath);
-      if (fileOrDir === true) {
+      this.logger.debug(`normalized torrentPath: "${torrentPath}"`);
+      const fileOrDir: number = await this.isFileOrDirectoryOrUnknown(torrentPath);
+      if (fileOrDir === this.fileOrDirsState.FILE) {
         // Is File
         const fileExtension: string = extname(torrentPath);
         this.logger.info(`Torrent: "${this.torrentInfo.name}" is a FILE`);
@@ -252,12 +259,17 @@ class Torrentclear {
           );
           this.logger.info(`Torrent does not match allowed extensions. NO ACTION`);
         }
-      } else if (fileOrDir === false) {
+      } else if (fileOrDir === this.fileOrDirsState.DIR) {
         // Is Directory
         this.logger.info(`Torrent: "${this.torrentInfo.name}" is a DIRECTORY`);
         this.logger.debug(`Torrent: full path: "${torrentPath}"`);
         // If Directory: Remove torrent and delete folder with files inside
         await this.torrentRemoveAndDelete();
+      } else if (fileOrDir === this.fileOrDirsState.NOTFOUND) {
+        // File not Found into target directory
+        this.logger.warn(`Torrent: "${this.torrentInfo.name}" FILE NOT FOUND`);
+        // Only remove torrent
+        await this.torrentRemove();
       } else {
         // Unknown type: no next action
         this.logger.debug(`Torrent: "${this.torrentInfo.name}" is neither a file or a directory`);
@@ -451,20 +463,21 @@ class Torrentclear {
   }
 
   /**
-   * [Static]
    * Check torrent is file or directory
    * @param path - torrent path
    * @returns (boolean | undefined) - true: torrent is File, false: torrent is Directory / undefined - not File, not Directory
    */
-  private static async isFileOrDirectoryOrUnknown(path: string): Promise<boolean | undefined> {
+  private async isFileOrDirectoryOrUnknown(path: string): Promise<number> {
     try {
       const stat: Stats = lstatSync(path);
       const isFile: boolean = stat.isFile();
       const isDirectory: boolean = stat.isDirectory();
-      if (isFile) return true;
-      if (isDirectory) return false;
-      return undefined;
+      if (isFile) return this.fileOrDirsState.FILE;
+      if (isDirectory) return this.fileOrDirsState.DIR;
+      return this.fileOrDirsState.UNKNOWN;
     } catch (error) {
+      // For Error "ENOENT: no such file or directory, lstat ..."
+      if (error.code === 'ENOENT') return this.fileOrDirsState.NOTFOUND;
       throw error;
     }
   }
