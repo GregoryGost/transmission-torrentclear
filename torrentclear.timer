@@ -1,0 +1,21 @@
+# Transmission torrent clear timer (cron alias)
+#
+# OnCalendar format: DOW YYYY-MM-DD HH:MM:SS
+# DOW (Day Of Week)
+# Example: *-*-* *:*:00 (every minute)
+# Example: *-*-* *:00:00 (every hour)
+#
+# Use systemd-analyze calendar
+# Example: systemd-analyze calendar --iterations=5 "Mon *-05~3"
+#
+
+[Unit]
+Description=Transmission torrent clear process timer
+Requires=torrentclear.service
+
+[Timer]
+Unit=torrentclear.service
+OnCalendar=*-*-* *:00:00
+
+[Install]
+WantedBy=timers.target

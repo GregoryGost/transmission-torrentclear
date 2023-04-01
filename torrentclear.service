@@ -1,5 +1,5 @@
 [Unit]
-Description=Transmission torrent clear cron worker
+Description=Transmission torrent clear process
 After=syslog.target
 After=transmission-daemon.service
 Wants=transmission-daemon.service

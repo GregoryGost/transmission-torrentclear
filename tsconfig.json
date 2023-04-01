@@ -20,7 +20,6 @@
   "ts-node": {
     "esm": true
   },
-  "lib": ["ESNext", "ESNext.asynciterable"],
   "exclude": ["node_modules", "**/node_modules/*", "dist", "*.spec.ts"],
   "include": ["./src/*.ts", "./src/**/*.ts"]
 }

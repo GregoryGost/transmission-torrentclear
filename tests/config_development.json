@@ -2,7 +2,7 @@
   "node_env": "development",
   "login": "test_dev",
   "password": "1234567890123456789",
-  "log_date_format": "DD.MM.YYYY",
+  "date_format": "DD.MM.YYYY",
   "log_file_path": "./torrentclear_test.log",
   "ip_address": "192.168.88.22",
   "tcp_port": 9092,

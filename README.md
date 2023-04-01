@@ -1,10 +1,10 @@
 # **Transmission torrentclear application**
 
-![License](https://img.shields.io/github/license/GregoryGost/Transmission-torrentclear)
-![RepoSize](https://img.shields.io/github/repo-size/GregoryGost/Transmission-torrentclear)
-![CodeSize](https://img.shields.io/github/languages/code-size/GregoryGost/Transmission-torrentclear)
-![IssuesOpen](https://img.shields.io/github/issues-raw/GregoryGost/Transmission-torrentclear)
-![LatestRelease](https://img.shields.io/github/v/release/GregoryGost/Transmission-torrentclear)
+![License](https://img.shields.io/github/license/GregoryGost/transmission-torrentclear)
+![RepoSize](https://img.shields.io/github/repo-size/GregoryGost/transmission-torrentclear)
+![CodeSize](https://img.shields.io/github/languages/code-size/GregoryGost/transmission-torrentclear)
+![IssuesOpen](https://img.shields.io/github/issues-raw/GregoryGost/transmission-torrentclear)
+![LatestRelease](https://img.shields.io/github/v/release/GregoryGost/transmission-torrentclear)
 
 Создано в рамках статьи для блога: [Домашний Сервер: Часть 4 – Настройка Transmission daemon в контейнере LXC Proxmox-VE](https://gregory-gost.ru/domashnij-server-chast-4-nastrojka-transmission-daemon-v-kontejnere-lxc-proxmox-ve/)
 
@@ -21,7 +21,7 @@
 
 ## **Приложение** `transmission-torrentclear`
 
-Основной кодовой базой является программная платформа [NodeJS](https://nodejs.org/) основанная на движке [V8](https://v8.dev/)
+Основной кодовой базой является программная платформа [NodeJS](https://nodejs.org/) основанная на "браузерном" движке [V8](https://v8.dev/)
 
 Необходимо для автоматической очистки скачанных медиа торрент файлов согласно условиям:
 
@@ -33,7 +33,8 @@
 
 История версий:
 
-- v2.0.0 - (29.11.2022) Полностью заменен файл **torrentclear** на **NodeJS** проект. Изменена и расширена логика обработки, улучшено логирование (уровни info, debug, etc) и многое другое.
+- v2.0.1 - (01.04.2023) Исправлена ошибка НЕ удаления торрента, если файл был удален ранее (к примеру из Plex).
+- v2.0.0 - (29.11.2022) Полностью заменен файл **torrentclear** с **bash** версии на **NodeJS** версию. Изменена и расширена логика обработки, улучшено логирование (уровни info, debug, etc) и многое другое.
 
 &nbsp;
 
@@ -103,7 +104,7 @@ chmod +x torrentclear/dist/main.js
 Создаем файл настроек и задаем свои параметры
 
 ```shell
-nano /opt/torrentclear/dist/config.json
+nano /opt/torrentclear/config.json
 ```
 
 ```json
@@ -117,44 +118,76 @@ nano /opt/torrentclear/dist/config.json
 
 Обязательные:
 
-- `login` (обязательный) - Логин авторизации для transmission-remote. Прописан в файле `settings.json` самого Transmission. Как правило располагается по пути `/etc/transmission-daemon/`
-- `password` (обязательный) - Пароль авторизации для transmission-remote
+- `login` - Логин авторизации для transmission-remote. Прописан в файле `settings.json` самого Transmission. Как правило располагается по пути `/etc/transmission-daemon/`
+- `password` - Пароль авторизации для transmission-remote
 
 Опциональные:
 
 - `node_env` - Режим использования приложения. Задать `development` если режим разработки. Default: `production`
 - `log_level` - Уровень логирования. Default: `info`. Для режима разработки `trace`
 - `log_file_path` - Путь до файла сохранения логов. Default: `/var/log/transmission/torrentdone.log`
-- `log_date_format` - Формат вывода даты в логе. Default: `DD.MM.YYYY HH:mm:ss` Example: 12.11.2022 21:54:03
+- `date_format` - Формат вывода даты в логе и в приложении. Для форматирования используется модуль [fecha](https://github.com/taylorhakes/fecha) Default: `DD.MM.YYYY HH:mm:ss` Example: 12.11.2022 21:54:03
 - `ip_address` - IP адрес для доступа к transmission. Default: `127.0.0.1`
 - `tcp_port` - TCP порт для доступа к transmission. Default: `9091`
 - `limit_time` - Разница во времени (в секундах) по которому файл удаляется если не достигнут RATIO (второе условие). Default: `604800` (7 дней)
 - `settings_file_path` - Путь до файла с настройками transmission. Default: `/etc/transmission-daemon/settings.json`
-- `cron_expression` - Период запуска в формате [CRON](https://crontab.cronhub.io/). Default: `0 * * * *` (каждый час)
 - `allowed_media_extensions` - Расширения файлов перечисленные через запятую для которых осуществляется обработка. Default: `mkv,mp4,avi`
 
-Устанавливаем приложение как сервис systemd
+Устанавливаем приложение как сервис systemd и ставим его в автозапуск  
+Приложение работает через базовый таймер systemd  
+По умолчанию проверка происходит **каждый час**
 
 ```shell
 cp /opt/torrentclear/torrentclear.service /etc/systemd/system/
+cp /opt/torrentclear/torrentclear.timer /etc/systemd/system/
 systemctl daemon-reload
-systemctl enable torrentclear.service
-systemctl start torrentclear.service
+systemctl enable torrentclear.timer
+systemctl start torrentclear.timer
+```
+
+```shell
+systemctl status torrentclear.timer
+```
+
+```shell
+● torrentclear.timer - Transmission torrent clear process timer
+     Loaded: loaded (/etc/systemd/system/torrentclear.timer; enabled; vendor preset: enabled)
+     Active: active (waiting) since Thu 2022-12-08 22:26:20 MSK; 2min 35s ago
+    Trigger: Thu 2022-12-08 23:00:00 MSK; 31min left
+   Triggers: ● torrentclear.service
+
+Dec 08 22:26:20 TORRENT systemd[1]: Started Transmission torrent clear process timer.
+```
+
+```shell
 systemctl status torrentclear.service
 ```
 
 ```shell
 ● torrentclear.service - Transmission torrent clear cron worker
-     Loaded: loaded (/etc/systemd/system/torrentclear.service; enabled; vendor preset: enabled)
-     Active: active (running) since Tue 2022-11-29 22:36:44 MSK; 2s ago
-   Main PID: 27701 (node)
-      Tasks: 11 (limit: 19042)
-     Memory: 19.9M
-        CPU: 167ms
-     CGroup: /system.slice/torrentclear.service
-             └─27701 /usr/bin/node main.js
+     Loaded: loaded (/etc/systemd/system/torrentclear.service; disabled; vendor preset: enabled)
+     Active: inactive (dead) since Thu 2022-12-08 22:26:20 MSK; 3min 34s ago
+TriggeredBy: ● torrentclear.timer
+    Process: 12323 ExecStart=/usr/bin/node main.js (code=exited, status=0/SUCCESS)
+   Main PID: 12323 (code=exited, status=0/SUCCESS)
+        CPU: 160ms
+```
 
-Nov 29 22:36:44 TORRENT systemd[1]: Started Transmission torrent clear cron worker.
+Для настройки таймера отредактируйте файл `torrentclear.timer` и его параметр `OnCalendar`  
+Более детальное описание параметров таймера и [OnCalendar](https://www.freedesktop.org/software/systemd/man/systemd.time.html#) в частности
+
+Проверить свои таймеры можно с помощью встроенной утилиты `systemd-analyze calendar`  
+Пример: `systemd-analyze calendar --iterations=2 "Mon *-05~3"`
+
+```shell
+  Original form: Mon *-05~3
+Normalized form: Mon *-05~03 00:00:00
+    Next elapse: Mon 2023-05-29 00:00:00 MSK
+       (in UTC): Sun 2023-05-28 21:00:00 UTC
+       From now: 5 months 18 days left
+       Iter. #2: Mon 2028-05-29 00:00:00 MSK
+       (in UTC): Sun 2028-05-28 21:00:00 UTC
+       From now: 5 years 5 months left
 ```
 
 ## **Ротация логов**
