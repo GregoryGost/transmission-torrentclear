@@ -1,6 +1,6 @@
 {
   "name": "@gregory-gost/transmission-torrentclear",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Torrent clear script for transmission-daemon service",
   "license": "GPL-3",
   "keywords": [
