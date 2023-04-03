@@ -4,6 +4,7 @@ import { normalize, extname } from 'node:path';
 import { format } from 'fecha';
 import { Config } from './Config.js';
 import { Logger } from './Logger.js';
+import { Metrics } from './Metrics.js';
 
 interface TorrentInfoI {
   /**
@@ -51,6 +52,10 @@ class Torrentclear {
    */
   private readonly logger: Logger;
   /**
+   * Metrics instance object.
+   */
+  private readonly metric: Metrics;
+  /**
    * Connect commant for transmission-remote.
    * Example: transmission-remote 127.0.0.1:9091 -n login:password
    */
@@ -73,6 +78,7 @@ class Torrentclear {
   constructor(config: Config, logger: Logger) {
     this.config = config;
     this.logger = logger;
+    this.metric = new Metrics(this.config, this.logger);
     this.connect = this.connectCommandCreate();
     this.torrentInfo = {
       id: 0,
@@ -132,6 +138,7 @@ class Torrentclear {
     this.logger.info('==============================================================================================');
     if (error_flag) this.logger.error(`Failed to complete torrent verification process`);
     else this.logger.info(`Completing the torrent verification process`);
+    this.metric.save();
     this.logger.info(
       '##############################################################################################\n'
     );

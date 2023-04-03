@@ -92,6 +92,11 @@ class Config {
    * Default: `mkv,mp4,avi`
    */
   public readonly allowedMediaExtensions: RegExp;
+  /**
+   * Metrics save file path
+   * Default: `/var/log/transmission/torrentclear_metrics.log`
+   */
+  public readonly metricsFilePath: string;
 
   constructor(config_file_path?: string) {
     this.init(config_file_path);
@@ -102,6 +107,7 @@ class Config {
     this.logLevel = this.devmode ? 'trace' : this.getParam('log_level');
     this.dateFormat = this.getParam('date_format');
     this.logFilePath = this.getParam('log_file_path');
+    this.metricsFilePath = this.getParam('metrics_file_path');
     this.ipAddress = this.getParam('ip_address');
     this.port = Number(this.getParam('tcp_port'));
     this.limitTime = Number(this.getParam('limit_time'));
@@ -125,6 +131,7 @@ class Config {
       node_env: 'production',
       log_level: 'info',
       log_file_path: '/var/log/transmission/torrentclear.log',
+      metrics_file_path: '/var/log/transmission/torrentclear_metrics.log',
       date_format: 'DD.MM.YYYY HH:mm:ss',
       ip_address: '127.0.0.1',
       tcp_port: '9091',
