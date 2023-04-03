@@ -85,7 +85,7 @@ class Metrics {
         pcpu: (100 * (this.cpuUsage.user + this.cpuUsage.system)) / ((Date.now() - this.startDate) * 1000),
         resource: resource,
         uptime: this.uptime,
-        unix_timestamp: Math.trunc(Date.now() / 1000), // ms
+        unix_timestamp: Math.trunc(Date.now() / 1000), // ms => sec
       };
       //
       writeFileSync(file, JSON.stringify(metrics), 'utf-8');
