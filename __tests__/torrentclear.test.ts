@@ -11,6 +11,7 @@ import moment from 'moment';
 import type { Level } from 'log4js';
 //
 import { Torrentclear } from '../src/class/torrentclear';
+import { Config } from '../src/class/config';
 
 const fakeRootPath: string = normalize(join(cwd(), '__tests__', 'configs'));
 // Transmission date format: Thu Apr 25 22:20:32 2024
@@ -20,10 +21,18 @@ const nowFormatedDate = moment(new Date()).format('ddd MMM DD HH:mm:ss YYYY');
 let logInfoMock: jest.SpyInstance;
 let logDebugMock: jest.SpyInstance;
 let logErrorMock: jest.SpyInstance;
+//
+let configSettingsFileExistsMock: jest.SpyInstance;
 
 describe('torrentclear.ts - Positive tests', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+  });
+  beforeAll(() => {
+    configSettingsFileExistsMock = jest.spyOn(Config.prototype as any, 'settingsFileExists').mockImplementation();
+  });
+  afterAll(() => {
+    configSettingsFileExistsMock.mockRestore();
   });
   /**
    * Instance test
@@ -951,6 +960,12 @@ describe('torrentclear.ts - No action tests', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
+  beforeAll(() => {
+    configSettingsFileExistsMock = jest.spyOn(Config.prototype as any, 'settingsFileExists').mockImplementation();
+  });
+  afterAll(() => {
+    configSettingsFileExistsMock.mockRestore();
+  });
   it('Torrentclear - no torrents', async () => {
     const torrentclear: Torrentclear = new Torrentclear(fakeRootPath);
     //
@@ -1445,6 +1460,12 @@ LIMITS & BANDWIDTH
 describe('torrentclear.ts - Error tests', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+  });
+  beforeAll(() => {
+    configSettingsFileExistsMock = jest.spyOn(Config.prototype as any, 'settingsFileExists').mockImplementation();
+  });
+  afterAll(() => {
+    configSettingsFileExistsMock.mockRestore();
   });
   it('Torrentclear - Error torrents list command', async () => {
     const torrentclear: Torrentclear = new Torrentclear(fakeRootPath);

@@ -23,8 +23,12 @@ describe('server-logger.ts', () => {
    * Instance test
    */
   it('server-logger instance', async () => {
+    const configSettingsFileExistsMock = jest.spyOn(Config.prototype as any, 'settingsFileExists').mockImplementation();
+    //
     const serverLogger: ServerLogger = new ServerLogger(devConfigPath);
     expect(serverLogger instanceof ServerLogger).toBe(true);
+    //
+    configSettingsFileExistsMock.mockRestore();
   });
   it('server-logger instance - default path', async () => {
     // no config file
@@ -42,6 +46,7 @@ describe('server-logger.ts', () => {
    * Get config from server logger
    */
   it('get config and logger from ServerLogger', async () => {
+    const configSettingsFileExistsMock = jest.spyOn(Config.prototype as any, 'settingsFileExists').mockImplementation();
     // get config
     const serverLogger: ServerLogger = new ServerLogger(devConfigPath);
     expect(serverLogger.config instanceof Config).toBe(true);
@@ -54,11 +59,14 @@ describe('server-logger.ts', () => {
       });
     serverLogger.logger.log('hello world');
     expect(logMock).toHaveBeenNthCalledWith(1, 'hello world');
+    //
+    configSettingsFileExistsMock.mockRestore();
   });
   /**
    * Dev or Prod config logger
    */
   it('develop or prod config for logger', async () => {
+    const configSettingsFileExistsMock = jest.spyOn(Config.prototype as any, 'settingsFileExists').mockImplementation();
     // develop
     // appenders, level, enableCallStack
     const serverLoggerDev: ServerLogger = new ServerLogger(devConfigPath);
@@ -66,5 +74,7 @@ describe('server-logger.ts', () => {
     //
     const serverLoggerProd: ServerLogger = new ServerLogger(prodConfigPath);
     expect(serverLoggerProd.config.logFilePath).toBe('/var/log/transmission/torrentclear.log');
+    //
+    configSettingsFileExistsMock.mockRestore();
   });
 });

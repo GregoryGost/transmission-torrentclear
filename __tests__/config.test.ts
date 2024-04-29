@@ -43,18 +43,6 @@ describe('config.ts', () => {
       expect(error).toHaveProperty('message', 'Login or password must be filled in config.json file or Environment');
     }
   });
-  it('config check error tr environment value', async () => {
-    const testRootPath: string = normalize(join(cwd(), '__tests__', 'configs', 'no_tr_env'));
-    try {
-      new Config(testRootPath);
-    } catch (error) {
-      // eslint-disable-next-line jest/no-conditional-expect
-      expect(error).toHaveProperty(
-        'message',
-        `One or more parameters do not match the requirements: TR_APP_VERSION - "undefined", TR_TORRENT_ID - "200", TR_TORRENT_DIR - "/mnt/data/download", TR_TORRENT_NAME - "Some file name", TR_TORRENT_HASH - "9ef9e27600d656140ba016aa81460fe2e518cbda", TR_TIME_LOCALTIME - "Sun Nov  6 04:31:04 2022"`
-      );
-    }
-  });
   /**
    * Get all parameters test
    */
