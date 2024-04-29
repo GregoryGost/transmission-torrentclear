@@ -65,49 +65,36 @@
 
 ## Установка
 
-Нужно поставить NodeJS и менеджер пакетов PNPM (если Вы ставили приложение [torrentdone](https://github.com/GregoryGost/transmission-torrentdone) то всё уже должно быть установлено)  
+Достаточно поставить NodeJS
 Команды для Proxmox LXC Debian 11.5 под root
 
 ```shell
 apt update
 apt upgrade -y
-apt install -y curl gcc g++ make git
+apt install -y curl git
 ```
 
 Ставим NodeJS  
 Пойти в <https://github.com/nodesource/distributions/blob/master/README.md>  
-Выбрать LTS версию не ниже 16 (не тестировалось на 18, но работать должно)
+Выбрать LTS версию не ниже 20
 
 ```shell
-curl -fsSL https://deb.nodesource.com/setup_16.x | bash -
+curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
 apt update
 apt install -y nodejs
 node -v
-v16.17.0
-```
-
-Устанавливаем глобально менеджер пакетов PNPM
-
-```shell
-curl -fsSL https://get.pnpm.io/install.sh | sh -
-export PNPM_HOME="/root/.local/share/pnpm"
-export PATH="$PNPM_HOME:$PATH"
-pnpm -v
-7.15.0
+v20.11.0
 ```
 
 Далее создаем проект и настраиваем его
 
-Если Вы не хотите ставить PNPM, то можете удалить файл `pnpm-lock.yaml` и использовать стандартную команду `npm ci --only=production` вместо `pnpm i -P`
-
 ```shell
 mkdir /opt/torrentclear
 cd /opt/torrentclear
-git clone https://github.com/GregoryGost/Transmission-torrentclear.git .
-pnpm i -P
+git clone https://github.com/GregoryGost/transmission-torrentclear.git .
 cd ..
 chown -R debian-transmission:debian-transmission torrentclear/
-chmod +x torrentclear/dist/main.js
+chmod +x torrentclear/dist/index.js torrentclear/update.sh
 ```
 
 ### Конфигурирование
@@ -137,13 +124,12 @@ nano /opt/torrentclear/config.json
 - `node_env` - Режим использования приложения. Задать `development` если режим разработки. Default: `production`
 - `log_level` - Уровень логирования. Default: `info`. Для режима разработки `trace`
 - `log_file_path` - Путь до файла сохранения логов. Default: `/var/log/transmission/torrentdone.log`
-- `metrics_file_path` - Путь до файла сохранения метрик. Default: `/var/log/transmission/torrentclear_metrics.log`
-- `date_format` - Формат вывода даты в логе и в приложении. Для форматирования используется модуль [fecha](https://github.com/taylorhakes/fecha) Default: `DD.MM.YYYY HH:mm:ss` Example: 12.11.2022 21:54:03
+- `date_format` - Формат вывода даты в приложении. Для форматирования используется модуль [moment](https://www.npmjs.com/package/moment) Default: `DD.MM.YYYY_HH:mm:ss` Example: 12.11.2022_21:54:03
+- `log_date_format` - Формат вывода даты в логах (log4js). Для форматирования используется модуль [date-format](https://www.npmjs.com/package/date-format) Default: `dd.MM.yyyy_hh:mm:ss.SSS` Example: 12.11.2022_21:54:03.254
 - `ip_address` - IP адрес для доступа к transmission. Default: `127.0.0.1`
 - `tcp_port` - TCP порт для доступа к transmission. Default: `9091`
 - `limit_time` - Разница во времени (в секундах) по которому файл удаляется если не достигнут RATIO (второе условие). Default: `604800` (7 дней)
 - `settings_file_path` - Путь до файла с настройками transmission. Default: `/etc/transmission-daemon/settings.json`
-- `allowed_media_extensions` - Расширения файлов перечисленные через запятую для которых осуществляется обработка. Default: `mkv,mp4,avi`
 
 Устанавливаем приложение как сервис systemd и ставим его в автозапуск  
 Приложение работает через базовый таймер systemd  
@@ -203,6 +189,25 @@ Normalized form: Mon *-05~03 00:00:00
 ```
 
 ## Обновление
+
+Стоит обновить NodeJS. Как пример обновление на 20 LTS версию.
+
+```shell
+curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+apt update && apt upgrade -y
+```
+
+Для обновления из `master` ветки необходимо запустить файл `update.sh` без указания каких-либо параметров
+
+```shell
+./update.sh
+```
+
+Если вы хотите обновить из другой ветки, просто передайте её название скрипту обновления
+
+```shell
+./update.sh develop
+```
 
 ## Ротация логов
 
