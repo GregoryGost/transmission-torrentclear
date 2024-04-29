@@ -1,0 +1,7 @@
+{
+  "node_env": "production",
+  "login": "test_prod",
+  "password": "1234567890123456789",
+  "settings_file_path": "./__tests__/settings.json",
+  "log_file_path": "./torrentclear_prod.log"
+}

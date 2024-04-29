@@ -1,0 +1,7 @@
+{
+  "node_env": "development",
+  "login": "",
+  "password": "password",
+  "log_file_path": "./logs/torrentclone.log",
+  "settings_file_path": "./__tests__/settings.json"
+}

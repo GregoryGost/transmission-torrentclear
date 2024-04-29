@@ -1,0 +1,7 @@
+{
+  "node_env": "development",
+  "login": "test",
+  "password": "password",
+  "log_file_path": "./logs/torrentclear.log",
+  "settings_file_path": "./__tests__/settings.json"
+}

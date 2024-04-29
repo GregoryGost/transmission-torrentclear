@@ -1,0 +1,4 @@
+!configs/config.json
+!configs/no_login/config.json
+!configs/no_tr_env/config.json
+!configs/ak_prod/config.json
