@@ -73,7 +73,7 @@ describe('server-logger.ts', () => {
     expect(serverLoggerDev.config.logFilePath).toBe('./torrentclear_test.log');
     //
     const serverLoggerProd: ServerLogger = new ServerLogger(prodConfigPath);
-    expect(serverLoggerProd.config.logFilePath).toBe('/var/log/transmission/torrentclear.log');
+    expect(serverLoggerProd.config.logFilePath).toBe('./torrentclear_prod.log');
     //
     configSettingsFileExistsMock.mockRestore();
   });

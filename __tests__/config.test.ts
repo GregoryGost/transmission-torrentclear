@@ -75,7 +75,7 @@ describe('config.ts', () => {
     expect(config.logLevel).toBe('info');
     expect(config.dateFormat).toBe('DD.MM.YYYY_HH:mm:ss');
     expect(config.logDateFormat).toBe('dd.MM.yyyy_hh:mm:ss.SSS');
-    expect(config.logFilePath).toBe('/var/log/transmission/torrentclear.log');
+    expect(config.logFilePath).toBe('./torrentclear_prod.log');
     //
     expect(config.ipAddress).toBe('127.0.0.1');
     expect(config.port).toBe(9091);
