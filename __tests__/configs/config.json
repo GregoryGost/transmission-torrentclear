@@ -3,10 +3,11 @@
   "login": "test_dev",
   "password": "1234567890123456789",
   "date_format": "DD.MM.YYYY",
+  "log_date_format": "dd.MM.yyyy",
   "log_file_path": "./torrentclear_test.log",
   "ip_address": "192.168.88.22",
   "tcp_port": 9092,
   "limit_time": 100000,
-  "settings_file_path": "E:\\WORK\\NodeJS\\ACTIVE\\transmission_workspace\\transmission-torrentclear\\tests\\settings.json",
+  "settings_file_path": "./__tests__/settings.json",
   "cron_expression": "0 1 * * *"
 }

@@ -1,38 +1,51 @@
-# **Transmission torrentclear application**
+# Transmission torrentclear application
 
 ![License](https://img.shields.io/github/license/GregoryGost/transmission-torrentclear)
 ![RepoSize](https://img.shields.io/github/repo-size/GregoryGost/transmission-torrentclear)
 ![CodeSize](https://img.shields.io/github/languages/code-size/GregoryGost/transmission-torrentclear)
 ![IssuesOpen](https://img.shields.io/github/issues-raw/GregoryGost/transmission-torrentclear)
 ![LatestRelease](https://img.shields.io/github/v/release/GregoryGost/transmission-torrentclear)
+![CI](https://github.com/GregoryGost/transmission-torrentclear/actions/workflows/ci.yml/badge.svg)
+[![Check dist/](https://github.com/GregoryGost/transmission-torrentclear/actions/workflows/check-dist.yml/badge.svg)](https://github.com/GregoryGost/transmission-torrentclear/actions/workflows/check-dist.yml)
+[![CodeQL](https://github.com/GregoryGost/transmission-torrentclear/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/GregoryGost/transmission-torrentclear/actions/workflows/codeql-analysis.yml)
+[![Coverage](./badges/coverage.svg)](./badges/coverage.svg)
 
 Создано в рамках статьи для блога: [Домашний Сервер: Часть 4 – Настройка Transmission daemon в контейнере LXC Proxmox-VE](https://gregory-gost.ru/domashnij-server-chast-4-nastrojka-transmission-daemon-v-kontejnere-lxc-proxmox-ve/)
 
-## **Оглавление**
+## Оглавление
 
 <!--ts-->
 
-- [Приложение transmission-torrentclear](#приложение-transmission-torrentclear)
-  - [Установка](#установка)
+- [Описание](#описание)
+- [Установка](#установка)
+  - [Конфигурирование](#конфигурирование)
+- [Обновление](#обновление)
 - [Ротация логов](#ротация-логов)
 - [Лицензирование](#лицензирование)
+- [Немного о себе](#немного-о-себе)
 
 <!--te-->
 
-## **Приложение** `transmission-torrentclear`
+## Описание
 
 Основной кодовой базой является программная платформа [NodeJS](https://nodejs.org/) основанная на "браузерном" движке [V8](https://v8.dev/)
 
-Необходимо для автоматической очистки скачанных медиа торрент файлов согласно условиям:
+Данное приложение необходимо для автоматической очистки скачанных медиа торрент файлов через `transmission-daemon` согласно условиям:
 
 1. Если торрент скачан на `100%` и коэффициент отданного к скачанному (RATIO) больше, либо равен заданному в файле `settings.json` сервиса transmission-daemon
 2. Или кол-во дней на раздаче больше или равно заданному в конфигурации приложения.
 
-Соответственно эти значения можно менять в файле конфигурации.  
-Значение RATIO считывается из файла настроек transmission (путь по умолчанию `/etc/transmission-daemon/settings.json`)
+Соответственно эти значения можно менять в файлах конфигурации.  
+Значение RATIO считывается из файла настроек transmission-daemon (путь по умолчанию `/etc/transmission-daemon/settings.json`)
+Значение интервала между датами указывается в файле конфигурации приложения `config.json` (см. раздел **Конфигурирование**)
 
 История версий:
 
+- v3.0.0 - (28.04.2024) Изменение архитектуры сборки. Теперь нет необходимости качать зависимости из npm. Заменена библиотека логирования на log4js. Покрытие юнит тестами. Удален фильтр по расширению файлов, теперь обрабатываются все торрент файлы.
+
+&nbsp;
+
+- v2.1.0 - (03.04.2023) Добавлено сохранение метрик после полного выполнения работы приложения.
 - v2.0.1 - (01.04.2023) Исправлена ошибка НЕ удаления торрента, если файл был удален ранее (к примеру из Plex).
 - v2.0.0 - (29.11.2022) Полностью заменен файл **torrentclear** с **bash** версии на **NodeJS** версию. Изменена и расширена логика обработки, улучшено логирование (уровни info, debug, etc) и многое другое.
 
@@ -54,52 +67,41 @@
 - v0.0.5 - (18.04.2018) Добавлен комментарий к коду
 - v0.0.4 - (18.04.2018) Первая версия
 
-### **Установка**
+## Установка
 
-Нужно поставить NodeJS и менеджер пакетов PNPM (если Вы ставили приложение [torrentdone](https://github.com/GregoryGost/transmission-torrentdone) то всё уже должно быть установлено)  
+Достаточно поставить NodeJS
 Команды для Proxmox LXC Debian 11.5 под root
 
 ```shell
 apt update
 apt upgrade -y
-apt install -y curl gcc g++ make git
+apt install -y curl git
 ```
 
 Ставим NodeJS  
 Пойти в <https://github.com/nodesource/distributions/blob/master/README.md>  
-Выбрать LTS версию не ниже 16 (не тестировалось на 18, но работать должно)
+Выбрать LTS версию не ниже 20
 
 ```shell
-curl -fsSL https://deb.nodesource.com/setup_16.x | bash -
+curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
 apt update
 apt install -y nodejs
 node -v
-v16.17.0
-```
-
-Устанавливаем глобально менеджер пакетов PNPM
-
-```shell
-curl -fsSL https://get.pnpm.io/install.sh | sh -
-export PNPM_HOME="/root/.local/share/pnpm"
-export PATH="$PNPM_HOME:$PATH"
-pnpm -v
-7.15.0
+v20.11.0
 ```
 
 Далее создаем проект и настраиваем его
 
-Если Вы не хотите ставить PNPM, то можете удалить файл `pnpm-lock.yaml` и использовать стандартную команду `npm ci --only=production` вместо `pnpm i -P`
-
 ```shell
 mkdir /opt/torrentclear
 cd /opt/torrentclear
-git clone https://github.com/GregoryGost/Transmission-torrentclear.git .
-pnpm i -P
+git clone https://github.com/GregoryGost/transmission-torrentclear.git .
 cd ..
 chown -R debian-transmission:debian-transmission torrentclear/
-chmod +x torrentclear/dist/main.js
+chmod +x torrentclear/dist/index.js torrentclear/update.sh
 ```
+
+### Конфигурирование
 
 Создаем файл настроек и задаем свои параметры
 
@@ -126,12 +128,12 @@ nano /opt/torrentclear/config.json
 - `node_env` - Режим использования приложения. Задать `development` если режим разработки. Default: `production`
 - `log_level` - Уровень логирования. Default: `info`. Для режима разработки `trace`
 - `log_file_path` - Путь до файла сохранения логов. Default: `/var/log/transmission/torrentdone.log`
-- `date_format` - Формат вывода даты в логе и в приложении. Для форматирования используется модуль [fecha](https://github.com/taylorhakes/fecha) Default: `DD.MM.YYYY HH:mm:ss` Example: 12.11.2022 21:54:03
+- `date_format` - Формат вывода даты в приложении. Для форматирования используется модуль [moment](https://www.npmjs.com/package/moment) Default: `DD.MM.YYYY_HH:mm:ss` Example: 12.11.2022_21:54:03
+- `log_date_format` - Формат вывода даты в логах (log4js). Для форматирования используется модуль [date-format](https://www.npmjs.com/package/date-format) Default: `dd.MM.yyyy_hh:mm:ss.SSS` Example: 12.11.2022_21:54:03.254
 - `ip_address` - IP адрес для доступа к transmission. Default: `127.0.0.1`
 - `tcp_port` - TCP порт для доступа к transmission. Default: `9091`
 - `limit_time` - Разница во времени (в секундах) по которому файл удаляется если не достигнут RATIO (второе условие). Default: `604800` (7 дней)
 - `settings_file_path` - Путь до файла с настройками transmission. Default: `/etc/transmission-daemon/settings.json`
-- `allowed_media_extensions` - Расширения файлов перечисленные через запятую для которых осуществляется обработка. Default: `mkv,mp4,avi`
 
 Устанавливаем приложение как сервис systemd и ставим его в автозапуск  
 Приложение работает через базовый таймер systemd  
@@ -190,7 +192,28 @@ Normalized form: Mon *-05~03 00:00:00
        From now: 5 years 5 months left
 ```
 
-## **Ротация логов**
+## Обновление
+
+Стоит обновить NodeJS. Как пример обновление на 20 LTS версию.
+
+```shell
+curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+apt update && apt upgrade -y
+```
+
+Для обновления из `master` ветки необходимо запустить файл `update.sh` без указания каких-либо параметров
+
+```shell
+./update.sh
+```
+
+Если вы хотите обновить из другой ветки, просто передайте её название скрипту обновления
+
+```shell
+./update.sh develop
+```
+
+## Ротация логов
 
 Приложение по умолчанию пишет результат своей работы в LOG файл **torrentclear.log**  
 Log файл расположен по пути, где обычно хранятся все лог файлы самого transmisson-daemon:
@@ -216,7 +239,14 @@ systemctl restart logrotate.service
 systemctl status logrotate.service
 ```
 
-## **Лицензирование**
+## Лицензирование
 
 Все исходные материалы для проекта распространяются по лицензии [GPL v3](./LICENSE 'Описание лицензии').  
 Вы можете использовать проект в любом виде, в том числе и для коммерческой деятельности, но стоит помнить, что автор проекта не дает никаких гарантий на работоспособность исполняемых файлов, а так же не несет никакой ответственности по искам или за нанесенный ущерб.
+
+Этот репозиторий содержит ссылки на все используемые модули и их лицензии. Они собраны в
+[специальный файл лицензий](./dist/licenses.txt). Их авторы самостоятельно несут (или не несут) ответственность за качество, стабильность и работу этих модулей.
+
+## Немного о себе
+
+GregoryGost - <https://gregory-gost.ru>
