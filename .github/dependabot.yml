@@ -5,10 +5,10 @@ updates:
     schedule:
       interval: weekly
       day: sunday
-      time: 09:00
-      timezone: Europe/Moscow
+      time: '09:00'
+      timezone: 'Europe/Moscow'
     labels:
-      - 'actions'
+      - actions
     groups:
       actions-minor:
         update-types:
@@ -20,11 +20,11 @@ updates:
     schedule:
       interval: weekly
       day: sunday
-      time: 09:00
-      timezone: Europe/Moscow
+      time: '09:00'
+      timezone: 'Europe/Moscow'
     labels:
-      - 'pnpm'
-      - 'dependencies'
+      - pnpm
+      - dependencies
     groups:
       development:
         dependency-type: development
