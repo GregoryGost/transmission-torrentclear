@@ -2,6 +2,7 @@
   "preset": "ts-jest",
   "verbose": true,
   "clearMocks": true,
+  "resetMocks": true,
   "testEnvironment": "node",
   "moduleFileExtensions": [
     "js",

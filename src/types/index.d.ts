@@ -47,3 +47,10 @@ export interface TorrentInfoI {
    */
   dateDifference: number;
 }
+
+export interface FileOrDirsStateI {
+  FILE: number;
+  DIR: number;
+  NOTFOUND: number;
+  UNKNOWN: number;
+}

@@ -1,5 +1,5 @@
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { dirname, normalize, join } from 'node:path';
+import { dirname, normalize, join, resolve } from 'node:path';
 import { existsSync } from 'node:fs';
 import nconf from 'nconf';
 
@@ -35,11 +35,17 @@ class Config {
    */
   private readonly _logLevel: string;
   /**
-   * Date and time format. Used in winston and application.
+   * Date and time format. Used in application.
+   * Formatted string accepted by the [moment](https://www.npmjs.com/package/moment).
+   * Default: `DD.MM.YYYY_HH:mm:ss`
+   */
+  private readonly _dateFormat: string;
+  /**
+   * Date and time format. Used in log4js.
    * Formatted string accepted by the [date-format](https://www.npmjs.com/package/date-format).
    * Default: `dd.MM.yyyy_hh:mm:ss.SSS`
    */
-  private readonly _dateFormat: string;
+  private readonly _logDateFormat: string;
   //
   // TRANSMISSION SETTINGS
   //
@@ -88,15 +94,10 @@ class Config {
    */
   ratioLimit = 2;
   /**
-   * Allowed extensions for media files
-   * Default: `mkv,mp4,avi`
-   */
-  private readonly _allowedMediaExtensions: RegExp;
-  /**
    * Metrics save file path
    * Default: `/var/log/transmission/torrentclear_metrics.log`
    */
-  private readonly _metricsFilePath: string;
+  // private readonly _metricsFilePath: string;
 
   constructor(root_path?: string) {
     this._rootPath = root_path ?? Config.getRootDir();
@@ -107,14 +108,15 @@ class Config {
     this._appVersion = this.getParam('version');
     this._logLevel = this._devmode ? 'trace' : this.getParam('log_level');
     this._dateFormat = this.getParam('date_format');
+    this._logDateFormat = this.getParam('log_date_format');
     this._logFilePath = this.getParam('log_file_path');
-    this._metricsFilePath = this.getParam('metrics_file_path');
+    // this._metricsFilePath = this.getParam('metrics_file_path');
     this._ipAddress = this.getParam('ip_address');
     this._port = Number(this.getParam('tcp_port'));
     this._limitTime = Number(this.getParam('limit_time'));
     this._settingsFilePath = this.getParam('settings_file_path');
-    this._allowedMediaExtensions = Config.extensionsRegexTemplate(this.getParam('allowed_media_extensions'));
     this.setRatio();
+    this.check();
   }
 
   get rootPath(): string {
@@ -137,6 +139,10 @@ class Config {
     return this._dateFormat;
   }
 
+  get logDateFormat(): string {
+    return this._logDateFormat;
+  }
+
   get logFilePath(): string {
     return this._logFilePath;
   }
@@ -157,9 +163,9 @@ class Config {
     return this._password;
   }
 
-  get metricsFilePath(): string {
-    return this._metricsFilePath;
-  }
+  // get metricsFilePath(): string {
+  //   return this._metricsFilePath;
+  // }
 
   get limitTime(): number {
     return this._limitTime;
@@ -167,10 +173,6 @@ class Config {
 
   get settingsFilePath(): string {
     return this._settingsFilePath;
-  }
-
-  get allowedMediaExtensions(): RegExp {
-    return this._allowedMediaExtensions;
   }
 
   /**
@@ -187,17 +189,15 @@ class Config {
       node_env: 'production',
       log_level: 'info',
       log_file_path: '/var/log/transmission/torrentclear.log',
-      metrics_file_path: '/var/log/transmission/torrentclear_metrics.log',
-      date_format: 'DD.MM.YYYY HH:mm:ss',
+      // metrics_file_path: '/var/log/transmission/torrentclear_metrics.log',
+      date_format: 'DD.MM.YYYY_HH:mm:ss', // https://www.npmjs.com/package/moment
+      log_date_format: 'dd.MM.yyyy_hh:mm:ss.SSS', // https://www.npmjs.com/package/date-format
       ip_address: '127.0.0.1',
       tcp_port: '9091',
       limit_time: '604800',
       settings_file_path: '/etc/transmission-daemon/settings.json',
-      cron_expression: '0 * * * *',
-      allowed_media_extensions: 'mkv,mp4,avi',
     });
     this.nconf.load();
-    this.check();
     this.settingsFileExists();
     const settingFile: string = normalize(this.getParam('settings_file_path'));
     this.nconf.file('transmission', settingFile);
@@ -215,11 +215,24 @@ class Config {
   /**
    * Check login or password not found
    */
-  private check(): void {
+  check(): void {
     const login: string = this.getParam('login');
     const password: string = this.getParam('password');
     if (login === undefined || login === '' || password === undefined || password === '') {
-      throw new Error('Login or password must be filled in config file or Environment');
+      throw new Error('Login or password must be filled in config.json file or Environment');
+    }
+  }
+
+  /**
+   * Check exists transmission `settings.json` file
+   */
+  settingsFileExists(): void {
+    const settingsFilePath: string = normalize(this.getParam('settings_file_path'));
+    if (!existsSync(settingsFilePath)) {
+      const relativeSettingsPath: string = resolve(settingsFilePath);
+      if (!existsSync(relativeSettingsPath)) {
+        throw new Error(`Transmission settings file not found on path ${settingsFilePath}`);
+      }
     }
   }
 
@@ -249,36 +262,6 @@ class Config {
     // Example: LOGIN | LOG_LEVEL
     if (param === undefined) param = this.nconf.get(param_name.toUpperCase());
     return param;
-  }
-
-  /**
-   * Check exists transmission `settings.json` file
-   */
-  private settingsFileExists(): void {
-    const settingsFilePath: string = normalize(this.getParam('settings_file_path'));
-    if (!existsSync(settingsFilePath))
-      throw new Error(`Transmission settings file not found on path ${settingsFilePath}`);
-  }
-
-  /**
-   * Format allowed media extensions list string to regexp
-   * @param {string} allowed_media_extensions - allowed media extensions list
-   * @returns {RegExp} formated list
-   */
-  private static extensionsRegexTemplate(allowed_media_extensions: string): RegExp {
-    const extensionArray: string[] = allowed_media_extensions.split(',');
-    let regexString = `.(`;
-    if (extensionArray.length > 1) {
-      for (let i = 0; i < extensionArray.length; i++) {
-        if (Number(i) === 0) regexString += `${extensionArray[i]}|`;
-        else if (Number(i) === extensionArray.length - 1) regexString += `|${extensionArray[i]}`;
-        else regexString += extensionArray[i];
-      }
-    } else {
-      regexString += extensionArray[0];
-    }
-    regexString += `)`;
-    return new RegExp(regexString, 'i');
   }
 }
 

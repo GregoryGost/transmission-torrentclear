@@ -52,7 +52,7 @@ class ServerLogger {
           type: 'console',
           layout: {
             type: 'pattern',
-            pattern: `[%d{${this._config.dateFormat}}] : %[[%p]%] : %m`,
+            pattern: `[%d{${this._config.logDateFormat}}] : %[[%p]%] : %m`,
           },
         },
         logFile: {
@@ -62,7 +62,7 @@ class ServerLogger {
           compress: true,
           layout: {
             type: 'pattern',
-            pattern: `[%d{${this._config.dateFormat}}] : [%p] : %m`,
+            pattern: `[%d{${this._config.logDateFormat}}] : [%p] : %m`,
           },
         },
       },
