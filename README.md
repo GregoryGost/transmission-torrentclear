@@ -84,15 +84,14 @@ node -v
 v20.11.0
 ```
 
-Далее создаем проект и настраиваем его
+Далее создаем папку под приложение и настраиваем его
 
 ```shell
 mkdir /opt/torrentclear
 cd /opt/torrentclear
 git clone https://github.com/GregoryGost/transmission-torrentclear.git .
-cd ..
-chown -R debian-transmission:debian-transmission torrentclear/
-chmod +x torrentclear/dist/index.js torrentclear/update.sh
+chown -R debian-transmission:debian-transmission /opt/torrentclear
+chmod +x /opt/torrentclear/dist/index.js /opt/torrentclear/update.sh
 ```
 
 ### Конфигурирование
