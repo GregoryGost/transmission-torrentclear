@@ -1,6 +1,6 @@
 {
   "name": "@gregory-gost/transmission-torrentclear",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "Torrent clear script for transmission-daemon service",
   "license": "GPL-3",
   "keywords": [
@@ -20,29 +20,24 @@
   },
   "scripts": {
     "bundle": "pnpm run format:write && pnpm run package",
-    "ci-test": "jest",
-    "coverage": "make-coverage-badge --output-path ./badges/coverage.svg",
-    "format:write": "prettier --write **/*.ts",
-    "format:check": "prettier --check **/*.ts",
-    "lint": "npx eslint . -c ./.github/linters/.eslintrc.yml",
-    "package": "ncc build src/index.ts --license licenses.txt",
+    "ci-test": "pnpm jest",
+    "coverage": "pnpm make-coverage-badge --output-path ./badges/coverage.svg",
+    "format:write": "pnpm prettier --write .",
+    "format:check": "pnpm prettier --check .",
+    "lint": "pnpm eslint . -c ./.github/linters/.eslintrc.yml",
+    "package": "pnpm ncc build src/index.ts -o dist --license licenses.txt",
     "package:watch": "pnpm run package -- --watch",
     "all": "pnpm run format:write && pnpm run lint && pnpm run ci-test && pnpm run coverage && pnpm run package",
-    "check lib": "pnpm outdated"
+    "outdated-lib": "pnpm outdated"
   },
-  "packageManager": "pnpm@9.0.6",
   "engines": {
     "node": ">=20"
   },
-  "dependencies": {
-    "log4js": "6.9.1",
-    "moment": "2.30.1",
-    "nconf": "0.12.1"
-  },
   "devDependencies": {
+    "@jest/globals": "29.7.0",
     "@types/jest": "29.5.12",
     "@types/nconf": "0.10.6",
-    "@types/node": "20.12.8",
+    "@types/node": "20.12.11",
     "@typescript-eslint/eslint-plugin": "7.8.0",
     "@typescript-eslint/parser": "7.8.0",
     "@vercel/ncc": "0.38.1",
@@ -56,7 +51,9 @@
     "prettier": "3.2.5",
     "prettier-eslint": "16.3.0",
     "ts-jest": "29.1.2",
-    "type-fest": "4.18.1",
+    "log4js": "6.9.1",
+    "moment": "2.30.1",
+    "nconf": "0.12.1",
     "typescript": "5.4.5"
   }
 }
