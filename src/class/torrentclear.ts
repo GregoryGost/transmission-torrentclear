@@ -68,7 +68,7 @@ class Torrentclear {
       percent: 0,
       ratio: 0,
       dateDone: '',
-      dateDifference: 0,
+      dateDifference: 0
     };
   }
 
@@ -404,7 +404,7 @@ class Torrentclear {
         percent: Number(torrentPercent),
         ratio: Number(torrentRatio),
         dateDone: this.dateFormat(parsedFinishDate),
-        dateDifference: Math.round((nowDate - parsedFinishDate) / 1000), // ms => sec
+        dateDifference: Math.round((nowDate - parsedFinishDate) / 1000) // ms => sec
       };
       this._logger.debug(`Torrent ID "${this._torrentInfo.id}" info:`);
       this._logger.debug(`   Name: "${this._torrentInfo.name}"`);

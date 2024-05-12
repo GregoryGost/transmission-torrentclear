@@ -195,7 +195,7 @@ class Config {
       ip_address: '127.0.0.1',
       tcp_port: '9091',
       limit_time: '604800',
-      settings_file_path: '/etc/transmission-daemon/settings.json',
+      settings_file_path: '/etc/transmission-daemon/settings.json'
     });
     this.nconf.load();
     this.settingsFileExists();

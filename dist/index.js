@@ -24480,7 +24480,7 @@ class Config {
             ip_address: '127.0.0.1',
             tcp_port: '9091',
             limit_time: '604800',
-            settings_file_path: '/etc/transmission-daemon/settings.json',
+            settings_file_path: '/etc/transmission-daemon/settings.json'
         });
         this.nconf.load();
         this.settingsFileExists();
@@ -24585,8 +24585,8 @@ class ServerLogger {
                     type: 'console',
                     layout: {
                         type: 'pattern',
-                        pattern: `[%d{${this._config.logDateFormat}}] : %[[%p]%] : %m`,
-                    },
+                        pattern: `[%d{${this._config.logDateFormat}}] : %[[%p]%] : %m`
+                    }
                 },
                 logFile: {
                     type: 'file',
@@ -24595,17 +24595,17 @@ class ServerLogger {
                     compress: true,
                     layout: {
                         type: 'pattern',
-                        pattern: `[%d{${this._config.logDateFormat}}] : [%p] : %m`,
-                    },
-                },
+                        pattern: `[%d{${this._config.logDateFormat}}] : [%p] : %m`
+                    }
+                }
             },
             categories: {
                 default: {
                     appenders: this._config.devmode ? ['console'] : ['console', 'logFile'],
                     level: this._config.logLevel,
-                    enableCallStack: this._config.devmode ? true : false,
-                },
-            },
+                    enableCallStack: this._config.devmode ? true : false
+                }
+            }
         };
         this._log4js.configure(configServerLogger);
     }
@@ -24653,7 +24653,7 @@ class Torrentclear {
             percent: 0,
             ratio: 0,
             dateDone: '',
-            dateDifference: 0,
+            dateDifference: 0
         };
     }
     get logger() {
@@ -24897,7 +24897,7 @@ class Torrentclear {
                 percent: Number(torrentPercent),
                 ratio: Number(torrentRatio),
                 dateDone: this.dateFormat(parsedFinishDate),
-                dateDifference: Math.round((nowDate - parsedFinishDate) / 1000),
+                dateDifference: Math.round((nowDate - parsedFinishDate) / 1000)
             };
             this._logger.debug(`Torrent ID "${this._torrentInfo.id}" info:`);
             this._logger.debug(`   Name: "${this._torrentInfo.name}"`);

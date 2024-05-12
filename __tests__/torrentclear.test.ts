@@ -39,7 +39,7 @@ describe('torrentclear.ts - Positive tests', () => {
       percent: 0,
       ratio: 0,
       dateDone: '',
-      dateDifference: 0,
+      dateDifference: 0
     });
     expect(torrentclear.torrentProcessCount).toBe(0);
     expect(torrentclear.torrentSuccessCount).toBe(0);
