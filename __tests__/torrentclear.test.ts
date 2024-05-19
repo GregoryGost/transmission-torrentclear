@@ -52,15 +52,13 @@ describe('torrentclear.ts - Positive tests', () => {
     const torrentclear: Torrentclear = new Torrentclear(fakeRootPath);
     //
     jest.spyOn(cproc, 'execSync').mockImplementation((command: string, _options: any): any => {
-      if (command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:1234567890123456789 --list') {
+      if (command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:***** --list') {
         const result = `ID     Done       Have  ETA           Up    Down  Ratio  Status       Name
   35   100%   22.11 GB  12 days      0.0     0.0    0.0  Seeding      Шерлок Холмс S01 Serial WEB-DL (1080p)
 Sum:          24.08 GB              15.0  18007.0`;
         return result;
       }
-      if (
-        command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:1234567890123456789 --torrent 35 --info'
-      ) {
+      if (command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:***** --torrent 35 --info') {
         const result = `NAME
   Id: 35
   Name: Шерлок Холмс S01 Serial WEB-DL (1080p)
@@ -109,15 +107,10 @@ LIMITS & BANDWIDTH
 `;
         return result;
       }
-      if (
-        command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:1234567890123456789 --torrent 35 --stop'
-      ) {
+      if (command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:***** --torrent 35 --stop') {
         return `192.168.88.22:9092/transmission/rpc/\nresponded: "success"`;
       }
-      if (
-        command ===
-        'transmission-remote 192.168.88.22:9092 --auth test_dev:1234567890123456789 --torrent 35 --remove-and-delete'
-      ) {
+      if (command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:***** --torrent 35 --remove-and-delete') {
         return `192.168.88.22:9092/transmission/rpc/\nresponded: "success"`;
       }
       return 'no action';
@@ -160,7 +153,7 @@ LIMITS & BANDWIDTH
     // log Debug
     expect(logDebugMock).toHaveBeenNthCalledWith(
       1,
-      `Run command: "transmission-remote 192.168.88.22:9092 --auth test_dev:1234567890123456789 --list"`
+      `Run command: "transmission-remote 192.168.88.22:9092 --auth test_dev:***** --list"`
     );
     expect(logDebugMock).toHaveBeenNthCalledWith(
       3,
@@ -169,7 +162,7 @@ LIMITS & BANDWIDTH
     expect(logDebugMock).toHaveBeenNthCalledWith(4, `ID found: "35"`);
     expect(logDebugMock).toHaveBeenNthCalledWith(
       5,
-      `Run command: "transmission-remote 192.168.88.22:9092 --auth test_dev:1234567890123456789 --torrent 35 --info"`
+      `Run command: "transmission-remote 192.168.88.22:9092 --auth test_dev:***** --torrent 35 --info"`
     );
     expect(logDebugMock).toHaveBeenNthCalledWith(6, `Torrent ID "35" info:`);
     expect(logDebugMock).toHaveBeenNthCalledWith(7, `   Name: "Шерлок Холмс S01 Serial WEB-DL (1080p)"`);
@@ -181,7 +174,7 @@ LIMITS & BANDWIDTH
     expect(logDebugMock).toHaveBeenNthCalledWith(16, `Stop torrent: (35) "Шерлок Холмс S01 Serial WEB-DL (1080p)"`);
     expect(logDebugMock).toHaveBeenNthCalledWith(
       17,
-      `Run command: "transmission-remote 192.168.88.22:9092 --auth test_dev:1234567890123456789 --torrent 35 --stop"`
+      `Run command: "transmission-remote 192.168.88.22:9092 --auth test_dev:***** --torrent 35 --stop"`
     );
     expect(logDebugMock).toHaveBeenNthCalledWith(
       18,
@@ -193,7 +186,7 @@ LIMITS & BANDWIDTH
     );
     expect(logDebugMock).toHaveBeenNthCalledWith(
       20,
-      `Run command: "transmission-remote 192.168.88.22:9092 --auth test_dev:1234567890123456789 --torrent 35 --remove-and-delete"`
+      `Run command: "transmission-remote 192.168.88.22:9092 --auth test_dev:***** --torrent 35 --remove-and-delete"`
     );
     expect(logDebugMock).toHaveBeenNthCalledWith(
       21,
@@ -210,15 +203,13 @@ LIMITS & BANDWIDTH
     const torrentclear: Torrentclear = new Torrentclear(fakeRootPath);
     //
     jest.spyOn(cproc, 'execSync').mockImplementation((command: string, _options: any): any => {
-      if (command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:1234567890123456789 --list') {
+      if (command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:***** --list') {
         const result = `ID     Done       Have  ETA           Up    Down  Ratio  Status       Name
   35   100%   22.11 GB  12 days      0.0     0.0    3.0  Seeding      Шерлок Холмс S01 Serial WEB-DL (1080p)
 Sum:          24.08 GB              15.0  18007.0`;
         return result;
       }
-      if (
-        command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:1234567890123456789 --torrent 35 --info'
-      ) {
+      if (command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:***** --torrent 35 --info') {
         const result = `NAME
   Id: 35
   Name: Шерлок Холмс S01 Serial WEB-DL (1080p)
@@ -267,15 +258,10 @@ LIMITS & BANDWIDTH
 `;
         return result;
       }
-      if (
-        command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:1234567890123456789 --torrent 35 --stop'
-      ) {
+      if (command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:***** --torrent 35 --stop') {
         return `192.168.88.22:9092/transmission/rpc/\nresponded: "success"`;
       }
-      if (
-        command ===
-        'transmission-remote 192.168.88.22:9092 --auth test_dev:1234567890123456789 --torrent 35 --remove-and-delete'
-      ) {
+      if (command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:***** --torrent 35 --remove-and-delete') {
         return `192.168.88.22:9092/transmission/rpc/\nresponded: "success"`;
       }
       return 'no action';
@@ -318,7 +304,7 @@ LIMITS & BANDWIDTH
     // log Debug
     expect(logDebugMock).toHaveBeenNthCalledWith(
       1,
-      `Run command: "transmission-remote 192.168.88.22:9092 --auth test_dev:1234567890123456789 --list"`
+      `Run command: "transmission-remote 192.168.88.22:9092 --auth test_dev:***** --list"`
     );
     expect(logDebugMock).toHaveBeenNthCalledWith(
       3,
@@ -327,7 +313,7 @@ LIMITS & BANDWIDTH
     expect(logDebugMock).toHaveBeenNthCalledWith(4, `ID found: "35"`);
     expect(logDebugMock).toHaveBeenNthCalledWith(
       5,
-      `Run command: "transmission-remote 192.168.88.22:9092 --auth test_dev:1234567890123456789 --torrent 35 --info"`
+      `Run command: "transmission-remote 192.168.88.22:9092 --auth test_dev:***** --torrent 35 --info"`
     );
     expect(logDebugMock).toHaveBeenNthCalledWith(7, `   Name: "Шерлок Холмс S01 Serial WEB-DL (1080p)"`);
     expect(logDebugMock).toHaveBeenNthCalledWith(14, `==> ACTION: Torrent delete on Ratio Limit`);
@@ -338,7 +324,7 @@ LIMITS & BANDWIDTH
     expect(logDebugMock).toHaveBeenNthCalledWith(16, `Stop torrent: (35) "Шерлок Холмс S01 Serial WEB-DL (1080p)"`);
     expect(logDebugMock).toHaveBeenNthCalledWith(
       17,
-      `Run command: "transmission-remote 192.168.88.22:9092 --auth test_dev:1234567890123456789 --torrent 35 --stop"`
+      `Run command: "transmission-remote 192.168.88.22:9092 --auth test_dev:***** --torrent 35 --stop"`
     );
     expect(logDebugMock).toHaveBeenNthCalledWith(
       18,
@@ -350,7 +336,7 @@ LIMITS & BANDWIDTH
     );
     expect(logDebugMock).toHaveBeenNthCalledWith(
       20,
-      `Run command: "transmission-remote 192.168.88.22:9092 --auth test_dev:1234567890123456789 --torrent 35 --remove-and-delete"`
+      `Run command: "transmission-remote 192.168.88.22:9092 --auth test_dev:***** --torrent 35 --remove-and-delete"`
     );
     expect(logDebugMock).toHaveBeenNthCalledWith(
       21,
@@ -367,13 +353,13 @@ LIMITS & BANDWIDTH
     const torrentclear: Torrentclear = new Torrentclear(fakeRootPath);
     //
     jest.spyOn(cproc, 'execSync').mockImplementation((command: string, _options: any): any => {
-      if (command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:1234567890123456789 --list') {
+      if (command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:***** --list') {
         const result = `    ID   Done       Have  ETA           Up    Down  Ratio  Status       Name
        7   100%    2.86 GB  Unknown      0.0     0.0    0.6  Idle         Beacon.23.S02E02.1080p.rus.LostFilm.TV.mkv
   Sum:             4.08 GB             150.0     0.0`;
         return result;
       }
-      if (command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:1234567890123456789 --torrent 7 --info') {
+      if (command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:***** --torrent 7 --info') {
         const result = `NAME
   Id: 7
   Name: Beacon.23.S02E02.1080p.rus.LostFilm.TV.mkv
@@ -422,12 +408,10 @@ LIMITS & BANDWIDTH
 `;
         return result;
       }
-      if (command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:1234567890123456789 --torrent 7 --stop') {
+      if (command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:***** --torrent 7 --stop') {
         return `192.168.88.22:9092/transmission/rpc/\nresponded: "success"`;
       }
-      if (
-        command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:1234567890123456789 --torrent 7 --remove'
-      ) {
+      if (command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:***** --torrent 7 --remove') {
         return `192.168.88.22:9092/transmission/rpc/\nresponded: "success"`;
       }
       return 'no action';
@@ -470,7 +454,7 @@ LIMITS & BANDWIDTH
     // log Debug
     expect(logDebugMock).toHaveBeenNthCalledWith(
       1,
-      `Run command: "transmission-remote 192.168.88.22:9092 --auth test_dev:1234567890123456789 --list"`
+      `Run command: "transmission-remote 192.168.88.22:9092 --auth test_dev:***** --list"`
     );
     expect(logDebugMock).toHaveBeenNthCalledWith(
       3,
@@ -479,7 +463,7 @@ LIMITS & BANDWIDTH
     expect(logDebugMock).toHaveBeenNthCalledWith(4, `ID found: "7"`);
     expect(logDebugMock).toHaveBeenNthCalledWith(
       5,
-      `Run command: "transmission-remote 192.168.88.22:9092 --auth test_dev:1234567890123456789 --torrent 7 --info"`
+      `Run command: "transmission-remote 192.168.88.22:9092 --auth test_dev:***** --torrent 7 --info"`
     );
     expect(logDebugMock).toHaveBeenNthCalledWith(7, `   Name: "Beacon.23.S02E02.1080p.rus.LostFilm.TV.mkv"`);
     expect(logDebugMock).toHaveBeenNthCalledWith(14, `==> ACTION: Torrent delete on Date Difference`);
@@ -490,7 +474,7 @@ LIMITS & BANDWIDTH
     expect(logDebugMock).toHaveBeenNthCalledWith(16, `Stop torrent: (7) "Beacon.23.S02E02.1080p.rus.LostFilm.TV.mkv"`);
     expect(logDebugMock).toHaveBeenNthCalledWith(
       17,
-      `Run command: "transmission-remote 192.168.88.22:9092 --auth test_dev:1234567890123456789 --torrent 7 --stop"`
+      `Run command: "transmission-remote 192.168.88.22:9092 --auth test_dev:***** --torrent 7 --stop"`
     );
     expect(logDebugMock).toHaveBeenNthCalledWith(
       18,
@@ -502,7 +486,7 @@ LIMITS & BANDWIDTH
     );
     expect(logDebugMock).toHaveBeenNthCalledWith(
       20,
-      `Run command: "transmission-remote 192.168.88.22:9092 --auth test_dev:1234567890123456789 --torrent 7 --remove"`
+      `Run command: "transmission-remote 192.168.88.22:9092 --auth test_dev:***** --torrent 7 --remove"`
     );
     expect(logDebugMock).toHaveBeenNthCalledWith(
       21,
@@ -519,13 +503,13 @@ LIMITS & BANDWIDTH
     const torrentclear: Torrentclear = new Torrentclear(fakeRootPath);
     //
     jest.spyOn(cproc, 'execSync').mockImplementation((command: string, _options: any): any => {
-      if (command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:1234567890123456789 --list') {
+      if (command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:***** --list') {
         const result = `    ID   Done       Have  ETA           Up    Down  Ratio  Status       Name
        7   100%    2.86 GB  Unknown      0.0     0.0    3.5  Idle         Beacon.23.S02E02.1080p.rus.LostFilm.TV.mkv
   Sum:             4.08 GB             150.0     0.0`;
         return result;
       }
-      if (command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:1234567890123456789 --torrent 7 --info') {
+      if (command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:***** --torrent 7 --info') {
         const result = `NAME
   Id: 7
   Name: Beacon.23.S02E02.1080p.rus.LostFilm.TV.mkv
@@ -574,12 +558,10 @@ LIMITS & BANDWIDTH
 `;
         return result;
       }
-      if (command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:1234567890123456789 --torrent 7 --stop') {
+      if (command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:***** --torrent 7 --stop') {
         return `192.168.88.22:9092/transmission/rpc/\nresponded: "success"`;
       }
-      if (
-        command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:1234567890123456789 --torrent 7 --remove'
-      ) {
+      if (command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:***** --torrent 7 --remove') {
         return `192.168.88.22:9092/transmission/rpc/\nresponded: "success"`;
       }
       return 'no action';
@@ -622,7 +604,7 @@ LIMITS & BANDWIDTH
     // log Debug
     expect(logDebugMock).toHaveBeenNthCalledWith(
       1,
-      `Run command: "transmission-remote 192.168.88.22:9092 --auth test_dev:1234567890123456789 --list"`
+      `Run command: "transmission-remote 192.168.88.22:9092 --auth test_dev:***** --list"`
     );
     expect(logDebugMock).toHaveBeenNthCalledWith(
       3,
@@ -631,7 +613,7 @@ LIMITS & BANDWIDTH
     expect(logDebugMock).toHaveBeenNthCalledWith(4, `ID found: "7"`);
     expect(logDebugMock).toHaveBeenNthCalledWith(
       5,
-      `Run command: "transmission-remote 192.168.88.22:9092 --auth test_dev:1234567890123456789 --torrent 7 --info"`
+      `Run command: "transmission-remote 192.168.88.22:9092 --auth test_dev:***** --torrent 7 --info"`
     );
     expect(logDebugMock).toHaveBeenNthCalledWith(7, `   Name: "Beacon.23.S02E02.1080p.rus.LostFilm.TV.mkv"`);
     expect(logDebugMock).toHaveBeenNthCalledWith(14, `==> ACTION: Torrent delete on Ratio Limit`);
@@ -642,7 +624,7 @@ LIMITS & BANDWIDTH
     expect(logDebugMock).toHaveBeenNthCalledWith(16, `Stop torrent: (7) "Beacon.23.S02E02.1080p.rus.LostFilm.TV.mkv"`);
     expect(logDebugMock).toHaveBeenNthCalledWith(
       17,
-      `Run command: "transmission-remote 192.168.88.22:9092 --auth test_dev:1234567890123456789 --torrent 7 --stop"`
+      `Run command: "transmission-remote 192.168.88.22:9092 --auth test_dev:***** --torrent 7 --stop"`
     );
     expect(logDebugMock).toHaveBeenNthCalledWith(
       18,
@@ -654,7 +636,7 @@ LIMITS & BANDWIDTH
     );
     expect(logDebugMock).toHaveBeenNthCalledWith(
       20,
-      `Run command: "transmission-remote 192.168.88.22:9092 --auth test_dev:1234567890123456789 --torrent 7 --remove"`
+      `Run command: "transmission-remote 192.168.88.22:9092 --auth test_dev:***** --torrent 7 --remove"`
     );
     expect(logDebugMock).toHaveBeenNthCalledWith(
       21,
@@ -671,14 +653,14 @@ LIMITS & BANDWIDTH
     const torrentclear: Torrentclear = new Torrentclear(fakeRootPath);
     //
     jest.spyOn(cproc, 'execSync').mockImplementation((command: string, _options: any): any => {
-      if (command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:1234567890123456789 --list') {
+      if (command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:***** --list') {
         const result = `    ID   Done       Have  ETA           Up    Down  Ratio  Status       Name
        7   100%    2.86 GB  Unknown      0.0     0.0    3.5  Idle         Beacon.23.S02E02.1080p.rus.LostFilm.TV.mkv
        9   100%    1.23 GB  3 hrs      150.0     0.0    3.3  Idle         Star.Wars.The.Bad.Batch.S03E14.1080p.rus.LostFilm.TV.mkv
   Sum:             4.08 GB             150.0     0.0`;
         return result;
       }
-      if (command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:1234567890123456789 --torrent 7 --info') {
+      if (command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:***** --torrent 7 --info') {
         const result = `NAME
   Id: 7
   Name: Beacon.23.S02E02.1080p.rus.LostFilm.TV.mkv
@@ -727,7 +709,7 @@ LIMITS & BANDWIDTH
 `;
         return result;
       }
-      if (command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:1234567890123456789 --torrent 9 --info') {
+      if (command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:***** --torrent 9 --info') {
         const result = `NAME
   Id: 9
   Name: Star.Wars.The.Bad.Batch.S03E14.1080p.rus.LostFilm.TV.mkv
@@ -776,20 +758,16 @@ LIMITS & BANDWIDTH
 `;
         return result;
       }
-      if (command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:1234567890123456789 --torrent 7 --stop') {
+      if (command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:***** --torrent 7 --stop') {
         return `192.168.88.22:9092/transmission/rpc/\nresponded: "success"`;
       }
-      if (command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:1234567890123456789 --torrent 9 --stop') {
+      if (command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:***** --torrent 9 --stop') {
         return `192.168.88.22:9092/transmission/rpc/\nresponded: "success"`;
       }
-      if (
-        command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:1234567890123456789 --torrent 7 --remove'
-      ) {
+      if (command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:***** --torrent 7 --remove') {
         return `192.168.88.22:9092/transmission/rpc/\nresponded: "success"`;
       }
-      if (
-        command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:1234567890123456789 --torrent 9 --remove'
-      ) {
+      if (command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:***** --torrent 9 --remove') {
         return `192.168.88.22:9092/transmission/rpc/\nresponded: "success"`;
       }
       return 'no action';
@@ -825,15 +803,13 @@ LIMITS & BANDWIDTH
     //
     jest.spyOn(cproc, 'execSync').mockImplementation((command: string, _options: any): any => {
       // console.log('execSync command:', command);
-      if (command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:1234567890123456789 --list') {
+      if (command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:***** --list') {
         const result = `    ID   Done       Have  ETA           Up    Down  Ratio  Status       Name
        17   100%    2.86 GB  Unknown      0.0     0.0    3.6  Idle         NoFile.S01E01.1080p.rus.LostFilm.TV.mkv
   Sum:             2.86 GB             150.0     0.0`;
         return result;
       }
-      if (
-        command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:1234567890123456789 --torrent 17 --info'
-      ) {
+      if (command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:***** --torrent 17 --info') {
         const result = `NAME
   Id: 7
   Name: NoFile.S01E01.1080p.rus.LostFilm.TV.mkv
@@ -882,14 +858,10 @@ LIMITS & BANDWIDTH
 `;
         return result;
       }
-      if (
-        command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:1234567890123456789 --torrent 17 --stop'
-      ) {
+      if (command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:***** --torrent 17 --stop') {
         return `192.168.88.22:9092/transmission/rpc/\nresponded: "success"`;
       }
-      if (
-        command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:1234567890123456789 --torrent 17 --remove'
-      ) {
+      if (command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:***** --torrent 17 --remove') {
         return `192.168.88.22:9092/transmission/rpc/\nresponded: "success"`;
       }
       return 'no action';
@@ -925,7 +897,7 @@ LIMITS & BANDWIDTH
     // log Debug
     expect(logDebugMock).toHaveBeenNthCalledWith(
       1,
-      `Run command: "transmission-remote 192.168.88.22:9092 --auth test_dev:1234567890123456789 --list"`
+      `Run command: "transmission-remote 192.168.88.22:9092 --auth test_dev:***** --list"`
     );
     expect(logDebugMock).toHaveBeenNthCalledWith(
       3,
@@ -955,7 +927,7 @@ describe('torrentclear.ts - No action tests', () => {
     const torrentclear: Torrentclear = new Torrentclear(fakeRootPath);
     //
     jest.spyOn(cproc, 'execSync').mockImplementation((command: string, _options: any): any => {
-      if (command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:1234567890123456789 --list') {
+      if (command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:***** --list') {
         const result = `    ID   Done       Have  ETA           Up    Down  Ratio  Status       Name
 Sum:                None               0.0     0.0`;
         return result;
@@ -987,7 +959,7 @@ Sum:                None               0.0     0.0`;
     // log Debug
     expect(logDebugMock).toHaveBeenNthCalledWith(
       1,
-      `Run command: "transmission-remote 192.168.88.22:9092 --auth test_dev:1234567890123456789 --list"`
+      `Run command: "transmission-remote 192.168.88.22:9092 --auth test_dev:***** --list"`
     );
     // Log Error
     expect(logErrorMock).not.toHaveBeenCalled();
@@ -1001,14 +973,14 @@ Sum:                None               0.0     0.0`;
     //
     jest.spyOn(cproc, 'execSync').mockImplementation((command: string, _options: any): any => {
       // console.log('execSync command:', command);
-      if (command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:1234567890123456789 --list') {
+      if (command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:***** --list') {
         const result = `    ID   Done       Have  ETA           Up    Down  Ratio  Status       Name
        7   100%    2.86 GB  Unknown      0.0     0.0    0.6  Idle         Beacon.23.S02E02.1080p.rus.LostFilm.TV.mkv
        9   100%    1.23 GB  3 hrs      150.0     0.0    1.2  Idle         Star.Wars.The.Bad.Batch.S03E14.1080p.rus.LostFilm.TV.mkv
   Sum:             4.08 GB             150.0     0.0`;
         return result;
       }
-      if (command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:1234567890123456789 --torrent 7 --info') {
+      if (command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:***** --torrent 7 --info') {
         const result = `NAME
   Id: 7
   Name: Beacon.23.S02E02.1080p.rus.LostFilm.TV.mkv
@@ -1057,7 +1029,7 @@ LIMITS & BANDWIDTH
 `;
         return result;
       }
-      if (command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:1234567890123456789 --torrent 9 --info') {
+      if (command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:***** --torrent 9 --info') {
         const result = `NAME
   Id: 9
   Name: Star.Wars.The.Bad.Batch.S03E14.1080p.rus.LostFilm.TV.mkv
@@ -1137,7 +1109,7 @@ LIMITS & BANDWIDTH
     // log Debug
     expect(logDebugMock).toHaveBeenNthCalledWith(
       1,
-      `Run command: "transmission-remote 192.168.88.22:9092 --auth test_dev:1234567890123456789 --list"`
+      `Run command: "transmission-remote 192.168.88.22:9092 --auth test_dev:***** --list"`
     );
     expect(logDebugMock).toHaveBeenNthCalledWith(
       3,
@@ -1161,14 +1133,14 @@ LIMITS & BANDWIDTH
     //
     jest.spyOn(cproc, 'execSync').mockImplementation((command: string, _options: any): any => {
       // console.log('execSync command:', command);
-      if (command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:1234567890123456789 --list') {
+      if (command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:***** --list') {
         const result = `    ID   Done       Have  ETA           Up    Down  Ratio  Status       Name
        7   66%    2.86 GB  Unknown      0.0     0.0    0.6  Idle         Beacon.23.S02E02.1080p.rus.LostFilm.TV.mkv
        9   35%    1.23 GB  3 hrs      150.0     0.0    0.3  Idle         Star.Wars.The.Bad.Batch.S03E14.1080p.rus.LostFilm.TV.mkv
   Sum:             4.08 GB             150.0     0.0`;
         return result;
       }
-      if (command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:1234567890123456789 --torrent 7 --info') {
+      if (command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:***** --torrent 7 --info') {
         const result = `NAME
   Id: 7
   Name: Beacon.23.S02E02.1080p.rus.LostFilm.TV.mkv
@@ -1217,7 +1189,7 @@ LIMITS & BANDWIDTH
 `;
         return result;
       }
-      if (command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:1234567890123456789 --torrent 9 --info') {
+      if (command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:***** --torrent 9 --info') {
         const result = `NAME
   Id: 9
   Name: Star.Wars.The.Bad.Batch.S03E14.1080p.rus.LostFilm.TV.mkv
@@ -1266,20 +1238,16 @@ LIMITS & BANDWIDTH
 `;
         return result;
       }
-      if (command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:1234567890123456789 --torrent 7 --stop') {
+      if (command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:***** --torrent 7 --stop') {
         return `192.168.88.22:9092/transmission/rpc/\nresponded: "success"`;
       }
-      if (command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:1234567890123456789 --torrent 9 --stop') {
+      if (command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:***** --torrent 9 --stop') {
         return `192.168.88.22:9092/transmission/rpc/\nresponded: "success"`;
       }
-      if (
-        command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:1234567890123456789 --torrent 7 --remove'
-      ) {
+      if (command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:***** --torrent 7 --remove') {
         return `192.168.88.22:9092/transmission/rpc/\nresponded: "success"`;
       }
-      if (
-        command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:1234567890123456789 --torrent 9 --remove'
-      ) {
+      if (command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:***** --torrent 9 --remove') {
         return `192.168.88.22:9092/transmission/rpc/\nresponded: "success"`;
       }
       return 'no action';
@@ -1322,13 +1290,13 @@ LIMITS & BANDWIDTH
     //
     jest.spyOn(cproc, 'execSync').mockImplementation((command: string, _options: any): any => {
       // console.log('execSync command:', command);
-      if (command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:1234567890123456789 --list') {
+      if (command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:***** --list') {
         const result = `    ID   Done       Have  ETA           Up    Down  Ratio  Status       Name
        7   100%    2.86 GB  Unknown      0.0     0.0    3.6  Idle         Beacon.23.S02E02.1080p.rus.LostFilm.TV.mkv
   Sum:             4.08 GB             150.0     0.0`;
         return result;
       }
-      if (command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:1234567890123456789 --torrent 7 --info') {
+      if (command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:***** --torrent 7 --info') {
         const result = `NAME
   Id: 7
   Name: Beacon.23.S02E02.1080p.rus.LostFilm.TV.mkv
@@ -1377,12 +1345,10 @@ LIMITS & BANDWIDTH
 `;
         return result;
       }
-      if (command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:1234567890123456789 --torrent 7 --stop') {
+      if (command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:***** --torrent 7 --stop') {
         return `192.168.88.22:9092/transmission/rpc/\nresponded: "success"`;
       }
-      if (
-        command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:1234567890123456789 --torrent 7 --remove'
-      ) {
+      if (command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:***** --torrent 7 --remove') {
         return `192.168.88.22:9092/transmission/rpc/\nresponded: "success"`;
       }
       return 'no action';
@@ -1418,7 +1384,7 @@ LIMITS & BANDWIDTH
     // log Debug
     expect(logDebugMock).toHaveBeenNthCalledWith(
       1,
-      `Run command: "transmission-remote 192.168.88.22:9092 --auth test_dev:1234567890123456789 --list"`
+      `Run command: "transmission-remote 192.168.88.22:9092 --auth test_dev:***** --list"`
     );
     expect(logDebugMock).toHaveBeenNthCalledWith(
       3,
@@ -1475,7 +1441,7 @@ describe('torrentclear.ts - Error tests', () => {
     // log Debug
     expect(logDebugMock).toHaveBeenNthCalledWith(
       1,
-      `Run command: "transmission-remote 192.168.88.22:9092 --auth test_dev:1234567890123456789 --list"`
+      `Run command: "transmission-remote 192.168.88.22:9092 --auth test_dev:***** --list"`
     );
     // Log Error
     expect(logErrorMock).toHaveBeenNthCalledWith(1, `error execSync command`);
@@ -1490,13 +1456,13 @@ describe('torrentclear.ts - Error tests', () => {
     //
     jest.spyOn(cproc, 'execSync').mockImplementation((command: string, _options: any): any => {
       // console.log('execSync command:', command);
-      if (command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:1234567890123456789 --list') {
+      if (command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:***** --list') {
         const result = `    ID   Done       Have  ETA           Up    Down  Ratio  Status       Name
        7   100%    2.86 GB  Unknown      0.0     0.0    3.6  Idle         Beacon.23.S02E02.1080p.rus.LostFilm.TV.mkv
   Sum:             4.08 GB             150.0     0.0`;
         return result;
       }
-      if (command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:1234567890123456789 --torrent 7 --info') {
+      if (command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:***** --torrent 7 --info') {
         const result = `NAME
   Id: 7
   Name: Beacon.23.S02E02.1080p.rus.LostFilm.TV.mkv
@@ -1573,7 +1539,7 @@ LIMITS & BANDWIDTH
     // log Debug
     expect(logDebugMock).toHaveBeenNthCalledWith(
       1,
-      `Run command: "transmission-remote 192.168.88.22:9092 --auth test_dev:1234567890123456789 --list"`
+      `Run command: "transmission-remote 192.168.88.22:9092 --auth test_dev:***** --list"`
     );
     expect(logDebugMock).toHaveBeenNthCalledWith(
       3,
@@ -1598,13 +1564,13 @@ LIMITS & BANDWIDTH
     //
     jest.spyOn(cproc, 'execSync').mockImplementation((command: string, _options: any): any => {
       // console.log('execSync command:', command);
-      if (command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:1234567890123456789 --list') {
+      if (command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:***** --list') {
         const result = `    ID   Done       Have  ETA           Up    Down  Ratio  Status       Name
        7   100%    2.86 GB  Unknown      0.0     0.0    3.6  Idle         Beacon.23.S02E02.1080p.rus.LostFilm.TV.mkv
   Sum:             4.08 GB             150.0     0.0`;
         return result;
       }
-      if (command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:1234567890123456789 --torrent 7 --info') {
+      if (command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:***** --torrent 7 --info') {
         const result = `NAME
   Id: 7
   Name: Beacon.23.S02E02.1080p.rus.LostFilm.TV.mkv
@@ -1653,7 +1619,7 @@ LIMITS & BANDWIDTH
 `;
         return result;
       }
-      if (command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:1234567890123456789 --torrent 7 --stop') {
+      if (command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:***** --torrent 7 --stop') {
         return `192.168.88.22:9092/transmission/rpc/\nresponded: "success"`;
       }
       return 'no action';
@@ -1684,7 +1650,7 @@ LIMITS & BANDWIDTH
     // log Debug
     expect(logDebugMock).toHaveBeenNthCalledWith(
       1,
-      `Run command: "transmission-remote 192.168.88.22:9092 --auth test_dev:1234567890123456789 --list"`
+      `Run command: "transmission-remote 192.168.88.22:9092 --auth test_dev:***** --list"`
     );
     expect(logDebugMock).toHaveBeenNthCalledWith(
       3,
@@ -1709,15 +1675,13 @@ LIMITS & BANDWIDTH
     //
     jest.spyOn(cproc, 'execSync').mockImplementation((command: string, _options: any): any => {
       // console.log('execSync command:', command);
-      if (command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:1234567890123456789 --list') {
+      if (command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:***** --list') {
         const result = `ID     Done       Have  ETA           Up    Down  Ratio  Status       Name
   35   100%   22.11 GB  12 days      0.0     0.0    0.0  Seeding      Шерлок Холмс S01 Serial WEB-DL (1080p)
 Sum:          24.08 GB              15.0  18007.0`;
         return result;
       }
-      if (
-        command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:1234567890123456789 --torrent 35 --info'
-      ) {
+      if (command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:***** --torrent 35 --info') {
         const result = `NAME
   Id: 35
   Name: Шерлок Холмс S01 Serial WEB-DL (1080p)
@@ -1766,9 +1730,7 @@ LIMITS & BANDWIDTH
 `;
         return result;
       }
-      if (
-        command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:1234567890123456789 --torrent 35 --stop'
-      ) {
+      if (command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:***** --torrent 35 --stop') {
         return `192.168.88.22:9092/transmission/rpc/\nresponded: "success"`;
       }
       return 'no action';
@@ -1799,7 +1761,7 @@ LIMITS & BANDWIDTH
     // log Debug
     expect(logDebugMock).toHaveBeenNthCalledWith(
       1,
-      `Run command: "transmission-remote 192.168.88.22:9092 --auth test_dev:1234567890123456789 --list"`
+      `Run command: "transmission-remote 192.168.88.22:9092 --auth test_dev:***** --list"`
     );
     expect(logDebugMock).toHaveBeenNthCalledWith(
       3,
@@ -1824,7 +1786,7 @@ LIMITS & BANDWIDTH
     //
     jest.spyOn(cproc, 'execSync').mockImplementation((command: string, _options: any): any => {
       // console.log('execSync command:', command);
-      if (command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:1234567890123456789 --list') {
+      if (command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:***** --list') {
         const result = `    ID   Done       Have  ETA           Up    Down  Ratio  Status       Name
        7   100%    2.86 GB  Unknown      0.0     0.0    3.6  Idle         Beacon.23.S02E02.1080p.rus.LostFilm.TV.mkv
   Sum:             4.08 GB             150.0     0.0`;
@@ -1857,7 +1819,7 @@ LIMITS & BANDWIDTH
     // log Debug
     expect(logDebugMock).toHaveBeenNthCalledWith(
       1,
-      `Run command: "transmission-remote 192.168.88.22:9092 --auth test_dev:1234567890123456789 --list"`
+      `Run command: "transmission-remote 192.168.88.22:9092 --auth test_dev:***** --list"`
     );
     expect(logDebugMock).toHaveBeenNthCalledWith(
       3,
@@ -1866,7 +1828,7 @@ LIMITS & BANDWIDTH
     expect(logDebugMock).toHaveBeenNthCalledWith(4, `ID found: "7"`);
     expect(logDebugMock).toHaveBeenNthCalledWith(
       5,
-      `Run command: "transmission-remote 192.168.88.22:9092 --auth test_dev:1234567890123456789 --torrent 7 --info"`
+      `Run command: "transmission-remote 192.168.88.22:9092 --auth test_dev:***** --torrent 7 --info"`
     );
     // Log Error
     expect(logErrorMock).toHaveBeenNthCalledWith(1, `Torrent info data is EMPTY`);
