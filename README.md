@@ -5,10 +5,13 @@
 ![CodeSize](https://img.shields.io/github/languages/code-size/GregoryGost/transmission-torrentclear)
 ![IssuesOpen](https://img.shields.io/github/issues-raw/GregoryGost/transmission-torrentclear)
 ![LatestRelease](https://img.shields.io/github/v/release/GregoryGost/transmission-torrentclear)
+![LatestTag](https://img.shields.io/github/v/tag/GregoryGost/transmission-torrentclear?sort=date&logo=substack&logoColor=white)
 ![CI](https://github.com/GregoryGost/transmission-torrentclear/actions/workflows/ci.yml/badge.svg)
 [![Check dist/](https://github.com/GregoryGost/transmission-torrentclear/actions/workflows/check-dist.yml/badge.svg)](https://github.com/GregoryGost/transmission-torrentclear/actions/workflows/check-dist.yml)
 [![CodeQL](https://github.com/GregoryGost/transmission-torrentclear/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/GregoryGost/transmission-torrentclear/actions/workflows/codeql-analysis.yml)
 [![Coverage](./badges/coverage.svg)](./badges/coverage.svg)
+![Watchers](https://img.shields.io/github/watchers/GregoryGost/transmission-torrentclear)
+![RepoStars](https://img.shields.io/github/stars/GregoryGost/transmission-torrentclear)
 
 Создано в рамках статьи для блога:
 [Домашний Сервер: Часть 4 – Настройка Transmission daemon в контейнере LXC Proxmox-VE](https://gregory-gost.ru/domashnij-server-chast-4-nastrojka-transmission-daemon-v-kontejnere-lxc-proxmox-ve/)
