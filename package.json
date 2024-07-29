@@ -37,9 +37,9 @@
     "@jest/globals": "29.7.0",
     "@types/jest": "29.5.12",
     "@types/nconf": "0.10.6",
-    "@types/node": "20.14.11",
-    "@typescript-eslint/eslint-plugin": "7.16.1",
-    "@typescript-eslint/parser": "7.16.1",
+    "@types/node": "20.14.12",
+    "@typescript-eslint/eslint-plugin": "7.17.0",
+    "@typescript-eslint/parser": "7.17.0",
     "@vercel/ncc": "0.38.1",
     "eslint": "8.57.0",
     "eslint-plugin-github": "5.0.1",
@@ -54,6 +54,6 @@
     "log4js": "6.9.1",
     "moment": "2.30.1",
     "nconf": "0.12.1",
-    "typescript": "5.5.3"
+    "typescript": "5.5.4"
   }
 }
