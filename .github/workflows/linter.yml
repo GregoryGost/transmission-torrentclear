@@ -52,5 +52,6 @@ jobs:
           TYPESCRIPT_DEFAULT_STYLE: prettier
           VALIDATE_ALL_CODEBASE: true
           VALIDATE_JAVASCRIPT_STANDARD: false
+          VALIDATE_TYPESCRIPT_STANDARD: false
           VALIDATE_JSCPD: false
           VALIDATE_BASH_EXEC: false
