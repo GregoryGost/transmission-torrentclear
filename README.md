@@ -81,31 +81,30 @@
 Достаточно поставить Node.js Команды для Proxmox LXC Debian 11.5 под root
 
 ```shell
-apt update
-apt upgrade -y
-apt install -y curl git
+apt update && apt upgrade -y && apt install -y curl wget
 ```
 
-Ставим Node.js  
+Ставим **Node.js** если еще не стоит  
 Пойти в <https://github.com/nodesource/distributions/blob/master/README.md>  
-Выбрать LTS версию не ниже 20
+Выбрать LTS версию
 
 ```shell
-curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
-apt update
-apt install -y nodejs
+curl -fsSL https://deb.nodesource.com/setup_20.x -o nodesource_setup.sh
+bash nodesource_setup.sh
+apt update && apt install -y nodejs
 node -v
-v20.11.0
+v20.17.0
 ```
 
-Далее создаем папку под приложение и настраиваем его
+Далее создаем папку под приложение, делаем файл исполняемым. Создаем фейковый файл `package.json` (нужно для корректного
+определения корневой дирректории и нахождения файла конфигурации)
 
 ```shell
 mkdir /opt/torrentclear
 cd /opt/torrentclear
-git clone https://github.com/GregoryGost/transmission-torrentclear.git .
-chown -R debian-transmission:debian-transmission /opt/torrentclear
-chmod +x /opt/torrentclear/dist/index.js /opt/torrentclear/update.sh
+wget https://raw.githubusercontent.com/GregoryGost/transmission-torrentclear/refs/heads/main/dist/index.js
+chmod +x index.js
+echo '{"version":"3.0.2"}' > package.json
 ```
 
 ### Конфигурирование
@@ -210,20 +209,21 @@ Normalized form: Mon *-05~03 00:00:00
 Стоит обновить Node.js. Как пример обновление на 20 LTS версию.
 
 ```shell
-curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+curl -fsSL https://deb.nodesource.com/setup_20.x -o nodesource_setup.sh
+bash nodesource_setup.sh
 apt update && apt upgrade -y
 ```
 
-Для обновления из `master` ветки необходимо запустить файл `update.sh` без указания каких-либо параметров
+Для обновления можно просто перекачать `index.js` файл
 
 ```shell
-./update.sh
+wget -O index.js https://raw.githubusercontent.com/GregoryGost/transmission-torrentclear/refs/heads/main/dist/index.js
 ```
 
-Если вы хотите обновить из другой ветки, просто передайте её название скрипту обновления
+Если вы хотите обновить из другой ветки, просто поменяйте её название в пути скачивания
 
 ```shell
-./update.sh develop
+wget -O index.js https://raw.githubusercontent.com/GregoryGost/transmission-torrentclear/refs/heads/develop/dist/index.js
 ```
 
 ## Ротация логов
