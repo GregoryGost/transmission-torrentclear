@@ -24394,8 +24394,8 @@ const node_fs_1 = __nccwpck_require__(3024);
 const node_os_1 = __nccwpck_require__(8161);
 const nconf_1 = __importDefault(__nccwpck_require__(7771));
 class Config {
-    _rootPath;
     nconf = nconf_1.default;
+    _rootPath;
     _devmode;
     _appVersion;
     _logLevel;
@@ -24469,10 +24469,10 @@ class Config {
         return this._settingsFilePath;
     }
     init() {
-        const configFile = (0, node_path_1.normalize)(`${this._rootPath}/config.json`);
+        const configFile = (0, node_path_1.normalize)(`${this.rootPath}/config.json`);
         this.nconf.env();
         this.nconf.file('config', configFile);
-        this.nconf.file('package', (0, node_path_1.normalize)(`${this._rootPath}/package.json`));
+        this.nconf.file('package', (0, node_path_1.normalize)(`${this.rootPath}/package.json`));
         this.nconf.defaults({
             node_env: 'production',
             log_level: 'info',
@@ -24565,14 +24565,14 @@ exports.ServerLogger = void 0;
 const log4js = __importStar(__nccwpck_require__(7914));
 const config_1 = __nccwpck_require__(5741);
 class ServerLogger {
-    _log4js;
+    log4js;
     _config;
     _logger;
     constructor(root_path) {
-        this._log4js = log4js;
+        this.log4js = log4js;
         this._config = new config_1.Config(root_path);
         this.init();
-        this._logger = this._log4js.getLogger();
+        this._logger = this.log4js.getLogger();
     }
     get logger() {
         return this._logger;
@@ -24587,29 +24587,29 @@ class ServerLogger {
                     type: 'console',
                     layout: {
                         type: 'pattern',
-                        pattern: `[%d{${this._config.logDateFormat}}] : %[[%p]%] : %m`
+                        pattern: `[%d{${this.config.logDateFormat}}] : %[[%p]%] : %m`
                     }
                 },
                 logFile: {
                     type: 'file',
-                    filename: this._config.logFilePath,
+                    filename: this.config.logFilePath,
                     maxLogSize: '10M',
                     compress: true,
                     layout: {
                         type: 'pattern',
-                        pattern: `[%d{${this._config.logDateFormat}}] : [%p] : %m`
+                        pattern: `[%d{${this.config.logDateFormat}}] : [%p] : %m`
                     }
                 }
             },
             categories: {
                 default: {
-                    appenders: this._config.devmode ? ['console'] : ['console', 'logFile'],
-                    level: this._config.logLevel,
-                    enableCallStack: this._config.devmode ? true : false
+                    appenders: this.config.devmode ? ['console'] : ['console', 'logFile'],
+                    level: this.config.logLevel,
+                    enableCallStack: this.config.devmode ? true : false
                 }
             }
         };
-        this._log4js.configure(configServerLogger);
+        this.log4js.configure(configServerLogger);
     }
 }
 exports.ServerLogger = ServerLogger;
@@ -24634,19 +24634,20 @@ const moment_1 = __importDefault(__nccwpck_require__(4877));
 const config_1 = __nccwpck_require__(5741);
 const server_logger_1 = __nccwpck_require__(7773);
 class Torrentclear {
-    config;
+    _config;
     _logger;
-    connect;
+    _connect;
     regexSuccess = /success/i;
+    regexTorrentInfo = /(?<=Name:\s)(.*?)(?=\s*Hash:)|(?<=State:\s)(.*?)(?=\s*Location:)|(?<=Location:\s)(.*?)(?=\s*Percent Done:)|(?<=Percent Done:\s)(.*?)%(?=\s*ETA:)|(?<=Ratio:\s)(.*?)(?=\s*Corrupt DL:)|(?<=Date finished:\s)(.*?)(?=\s*Date started:|$)/g;
     fileOrDirsState = { FILE: 1, DIR: 2, NOTFOUND: 3, UNKNOWN: 4 };
     _torrentInfo;
     _torrentSuccessCount = 0;
     _torrentProcessCount = 0;
     _torrentIDs = [];
     constructor(root_path) {
-        this.config = new config_1.Config(root_path);
+        this._config = new config_1.Config(root_path);
         this._logger = new server_logger_1.ServerLogger(root_path).logger;
-        this.connect = this.connectCommandCreate();
+        this._connect = this.connectCommandCreate();
         this._torrentInfo = {
             id: 0,
             name: '',
@@ -24658,17 +24659,32 @@ class Torrentclear {
             dateDifference: 0
         };
     }
+    get connect() {
+        return this._connect;
+    }
+    get config() {
+        return this._config;
+    }
     get logger() {
         return this._logger;
     }
     get torrentInfo() {
         return this._torrentInfo;
     }
+    set torrentInfo(torrent_info) {
+        this._torrentInfo = torrent_info;
+    }
     get torrentSuccessCount() {
         return this._torrentSuccessCount;
     }
+    set torrentSuccessCount(count) {
+        this._torrentSuccessCount = count;
+    }
     get torrentProcessCount() {
         return this._torrentProcessCount;
+    }
+    set torrentProcessCount(count) {
+        this._torrentProcessCount = count;
     }
     get torrentIDs() {
         return this._torrentIDs;
@@ -24681,181 +24697,181 @@ class Torrentclear {
             this.endInfo();
         }
         catch (error) {
-            this._logger.error(error.message);
+            this.logger.error(error.message);
             this.endInfo(true);
         }
     }
     startInfo() {
-        this._logger.info('##############################################################################################');
-        this._logger.info(`transmission-torrentclear: "${this.config.appVersion}"`);
-        this._logger.info('==============================================================================================');
+        this.logger.info('##############################################################################################');
+        this.logger.info(`transmission-torrentclear: "${this.config.appVersion}"`);
+        this.logger.info('==============================================================================================');
     }
     endInfo(error_flag = false) {
-        this._logger.info('==============================================================================================');
+        this.logger.info('==============================================================================================');
         if (error_flag)
-            this._logger.error(`Failed to complete torrent verification process`);
+            this.logger.error(`Failed to complete torrent verification process`);
         else
-            this._logger.info(`Completing the torrent verification process`);
-        this._logger.info('##############################################################################################\n');
+            this.logger.info(`Completing the torrent verification process`);
+        this.logger.info('##############################################################################################\n');
     }
     async getIDs() {
         try {
             const command = `${this.connect} --list`;
-            this._logger.debug(`Run command: "${command}"`);
+            this.logger.debug(`Run command: "${command}"`);
             const execResult = await this.command(command);
             const resultTorrentsList = execResult.toString().match(/^\s+(\d+)\s.*?$/gim);
             if (resultTorrentsList === null || resultTorrentsList.length < 1) {
-                this._logger.info(`Torrents not found`);
+                this.logger.info(`Torrents not found`);
                 return;
             }
-            this._logger.debug(`Torrents list:`);
+            this.logger.debug(`Torrents list:`);
             for (const torrentLine of resultTorrentsList) {
-                this._logger.debug(`torrent: "${torrentLine.trim()}"`);
+                this.logger.debug(`torrent: "${torrentLine.trim()}"`);
                 const match = torrentLine.trim().match(/^(\d+).+$/i);
                 if (match !== null) {
                     const id = match[1];
-                    this._logger.debug(`ID found: "${id}"`);
-                    this._torrentIDs.push(Number(id));
+                    this.logger.debug(`ID found: "${id}"`);
+                    this.torrentIDs.push(Number(id));
                 }
             }
-            if (this._torrentIDs.length > 0)
-                this._logger.info(`IDs found: ${this._torrentIDs.join(', ')}`);
-            this._torrentProcessCount = this._torrentIDs.length;
+            if (this.torrentIDs.length > 0)
+                this.logger.info(`IDs found: ${this.torrentIDs.join(', ')}`);
+            this.torrentProcessCount = this.torrentIDs.length;
         }
         catch (error) {
-            this._logger.trace(error);
+            this.logger.trace(error);
             throw error;
         }
     }
     async torrentsProcess() {
         try {
-            if (this._torrentIDs.length > 0) {
-                for (const id of this._torrentIDs) {
-                    this._logger.info('==============================================================================================');
-                    this._logger.info(`TORRENT ID: "${id}" START PROCESS ...`);
+            if (this.torrentIDs.length > 0) {
+                for (const id of this.torrentIDs) {
+                    this.logger.info('==============================================================================================');
+                    this.logger.info(`TORRENT ID: "${id}" START PROCESS ...`);
                     await this.getTorrentInfo(id);
-                    if (this._torrentInfo.percent === 100) {
-                        const checkRatio = this.checkRatio(this._torrentInfo.ratio);
+                    if (this.torrentInfo.percent === 100) {
+                        const checkRatio = this.checkRatio(this.torrentInfo.ratio);
                         if (checkRatio) {
-                            this._logger.debug(`==> ACTION: Torrent delete on Ratio Limit`);
+                            this.logger.debug(`==> ACTION: Torrent delete on Ratio Limit`);
                             await this.clearTorrent();
-                            this._torrentSuccessCount++;
-                            this._logger.info(`Stopping and deleting a torrent "${this._torrentInfo.name}" by ratio limit completed successfully`);
+                            this.torrentSuccessCount++;
+                            this.logger.info(`Stopping and deleting a torrent "${this.torrentInfo.name}" by ratio limit completed successfully`);
                         }
                         else {
-                            const checkDateDifference = this.checkDateDifference(this._torrentInfo.dateDifference);
+                            const checkDateDifference = this.checkDateDifference(this.torrentInfo.dateDifference);
                             if (checkDateDifference) {
-                                this._logger.debug(`==> ACTION: Torrent delete on Date Difference`);
+                                this.logger.debug(`==> ACTION: Torrent delete on Date Difference`);
                                 await this.clearTorrent();
-                                this._torrentSuccessCount++;
-                                this._logger.info(`Stopping and deleting a torrent "${this._torrentInfo.name}" by datetime limit completed successfully`);
+                                this.torrentSuccessCount++;
+                                this.logger.info(`Stopping and deleting a torrent "${this.torrentInfo.name}" by datetime limit completed successfully`);
                             }
                             else {
-                                this._logger.info(`NO ACTION NEEDED (DATE AND RATIO)`);
+                                this.logger.info(`NO ACTION NEEDED (DATE AND RATIO)`);
                             }
                         }
                     }
                     else {
-                        this._logger.info(`NO ACTION NEEDED (< 100)`);
+                        this.logger.info(`NO ACTION NEEDED (< 100)`);
                     }
                 }
             }
         }
         catch (error) {
-            this._logger.trace(error);
+            this.logger.trace(error);
             throw error;
         }
     }
     async clearTorrent() {
         try {
-            const torrentPath = (0, node_path_1.normalize)(`${this._torrentInfo.location}/${this._torrentInfo.name}`);
-            this._logger.debug(`normalized torrentPath: "${torrentPath}"`);
+            const torrentPath = (0, node_path_1.normalize)(`${this.torrentInfo.location}/${this.torrentInfo.name}`);
+            this.logger.debug(`normalized torrentPath: "${torrentPath}"`);
             const fileOrDir = await this.isFileOrDirectoryOrUnknown(torrentPath);
             if (fileOrDir === this.fileOrDirsState.FILE) {
-                this._logger.info(`Torrent: "${this._torrentInfo.name}" is a FILE`);
+                this.logger.info(`Torrent: "${this.torrentInfo.name}" is a FILE`);
                 await this.torrentStop();
                 await this.torrentRemove();
             }
             else if (fileOrDir === this.fileOrDirsState.DIR) {
-                this._logger.info(`Torrent: "${this._torrentInfo.name}" is a DIRECTORY`);
+                this.logger.info(`Torrent: "${this.torrentInfo.name}" is a DIRECTORY`);
                 await this.torrentStop();
                 await this.torrentRemoveAndDelete();
             }
             else if (fileOrDir === this.fileOrDirsState.NOTFOUND) {
-                this._logger.warn(`Torrent: "${this._torrentInfo.name}" FILE NOT FOUND`);
+                this.logger.warn(`Torrent: "${this.torrentInfo.name}" FILE NOT FOUND`);
                 await this.torrentStop();
                 await this.torrentRemove();
             }
             else {
-                this._logger.debug(`Torrent: "${this._torrentInfo.name}" is neither a file or a directory`);
+                this.logger.debug(`Torrent: "${this.torrentInfo.name}" is neither a file or a directory`);
             }
         }
         catch (error) {
-            this._logger.trace(error);
+            this.logger.trace(error);
             throw error;
         }
     }
     async torrentStop() {
         try {
-            const command = `${this.connect} --torrent ${this._torrentInfo.id} --stop`;
-            this._logger.debug(`Stop torrent: (${this._torrentInfo.id}) "${this._torrentInfo.name}"`);
-            this._logger.debug(`Run command: "${command}"`);
+            const command = `${this.connect} --torrent ${this.torrentInfo.id} --stop`;
+            this.logger.debug(`Stop torrent: (${this.torrentInfo.id}) "${this.torrentInfo.name}"`);
+            this.logger.debug(`Run command: "${command}"`);
             let execResultStop = await this.command(command);
             execResultStop = execResultStop.replace(/(\r\n|\n|\r)/gm, '');
-            this._logger.debug(`execResultStop: ${execResultStop}`);
+            this.logger.debug(`execResultStop: ${execResultStop}`);
             if (!this.regexSuccess.test(execResultStop)) {
-                throw new Error(`Failed to stop torrent (${this._torrentInfo.id}) "${this._torrentInfo.name}". Reason: Negative result of exec command: ${execResultStop}`);
+                throw new Error(`Failed to stop torrent (${this.torrentInfo.id}) "${this.torrentInfo.name}". Reason: Negative result of exec command: ${execResultStop}`);
             }
         }
         catch (error) {
-            this._logger.trace(error);
+            this.logger.trace(error);
             throw error;
         }
     }
     async torrentRemove() {
         try {
-            const command = `${this.connect} --torrent ${this._torrentInfo.id} --remove`;
-            this._logger.debug(`Remove torrent without deleting file: (${this._torrentInfo.id}) "${this._torrentInfo.name}"`);
-            this._logger.debug(`Run command: "${command}"`);
+            const command = `${this.connect} --torrent ${this.torrentInfo.id} --remove`;
+            this.logger.debug(`Remove torrent without deleting file: (${this.torrentInfo.id}) "${this.torrentInfo.name}"`);
+            this.logger.debug(`Run command: "${command}"`);
             let execResult = await this.command(command);
             execResult = execResult.replace(/(\r\n|\n|\r)/gm, '');
-            this._logger.debug(`execResultRemove: ${execResult}`);
+            this.logger.debug(`execResultRemove: ${execResult}`);
             if (!this.regexSuccess.test(execResult)) {
-                throw new Error(`Failed to remove (no del) torrent (${this._torrentInfo.id}) "${this._torrentInfo.name}". Reason: Negative result of exec command: ${execResult}`);
+                throw new Error(`Failed to remove (no del) torrent (${this.torrentInfo.id}) "${this.torrentInfo.name}". Reason: Negative result of exec command: ${execResult}`);
             }
         }
         catch (error) {
-            this._logger.trace(error);
+            this.logger.trace(error);
             throw error;
         }
     }
     async torrentRemoveAndDelete() {
         try {
-            const command = `${this.connect} --torrent ${this._torrentInfo.id} --remove-and-delete`;
-            this._logger.debug(`Remove torrent with deleting file: (${this._torrentInfo.id}) "${this._torrentInfo.name}"`);
-            this._logger.debug(`Run command: "${command}"`);
+            const command = `${this.connect} --torrent ${this.torrentInfo.id} --remove-and-delete`;
+            this.logger.debug(`Remove torrent with deleting file: (${this.torrentInfo.id}) "${this.torrentInfo.name}"`);
+            this.logger.debug(`Run command: "${command}"`);
             let execResult = await this.command(command);
             execResult = execResult.replace(/(\r\n|\n|\r)/gm, '');
-            this._logger.debug(`execResultRemoveAndDelete: ${execResult}`);
+            this.logger.debug(`execResultRemoveAndDelete: ${execResult}`);
             if (!this.regexSuccess.test(execResult)) {
-                throw new Error(`Failed to remove and delete torrent (${this._torrentInfo.id}) "${this._torrentInfo.name}". Reason: Negative result of exec command: ${execResult}`);
+                throw new Error(`Failed to remove and delete torrent (${this.torrentInfo.id}) "${this.torrentInfo.name}". Reason: Negative result of exec command: ${execResult}`);
             }
         }
         catch (error) {
-            this._logger.trace(error);
+            this.logger.trace(error);
             throw error;
         }
     }
     checkRatio(ratio) {
         if (ratio >= this.config.ratioLimit) {
-            this._logger.info(`Torrent has reached the Ratio limit: "${ratio}" >= "${this.config.ratioLimit}"`);
+            this.logger.info(`Torrent has reached the Ratio limit: "${ratio}" >= "${this.config.ratioLimit}"`);
             return true;
         }
         return false;
     }
     checkDateDifference(date_difference) {
         if (date_difference >= this.config.limitTime) {
-            this._logger.info(`Torrent has reached the Date difference limit: "${date_difference}" >= "${this.config.limitTime}"`);
+            this.logger.info(`Torrent has reached the Date difference limit: "${date_difference}" >= "${this.config.limitTime}"`);
             return true;
         }
         return false;
@@ -24863,55 +24879,53 @@ class Torrentclear {
     async getTorrentInfo(id) {
         try {
             const command = `${this.connect} --torrent ${id} --info`;
-            this._logger.debug(`Run command: "${command}"`);
+            this.logger.debug(`Run command: "${command}"`);
             const execResult = await this.command(command);
-            const matchAll = execResult
-                .toString()
-                .matchAll(/Name:\s(.+)|Date\sfinished:\s+(.+)|Percent\sDone:\s(.+)%|Ratio:\s(.+)|State:\s(.+)|Location:\s(.+)/g);
-            const match = Array.from(matchAll);
-            if (match.length < 1)
+            const matchAll = execResult.toString().matchAll(this.regexTorrentInfo);
+            const matchArray = Array.from(matchAll);
+            if (matchArray.length < 1)
                 throw new Error(`Torrent info data is EMPTY`);
-            const torrentName = match[0][1];
+            const torrentName = matchArray[0][1];
             if (torrentName === undefined || torrentName === '')
                 throw new Error(`Torrent name not found in torrent info: "${id}"`);
-            const torrentState = match[1][5];
+            const torrentState = matchArray[1][2];
             if (torrentState === undefined || torrentState === '')
                 throw new Error(`Torrent state not found in torrent info: "${id}"`);
-            const torrentLocation = match[2][6];
+            const torrentLocation = matchArray[2][3];
             if (torrentLocation === undefined || torrentLocation === '')
                 throw new Error(`Torrent location not found in torrent info: "${id}"`);
-            const torrentPercent = match[3][3];
+            const torrentPercent = matchArray[3][4];
             if (torrentPercent === undefined || torrentPercent === '')
                 throw new Error(`Torrent percent not found in torrent info: "${id}"`);
-            const torrentRatio = match[4][4];
+            const torrentRatio = matchArray[4][5];
             if (torrentRatio === undefined || torrentRatio === '')
                 throw new Error(`Torrent ratio not found in torrent info: "${id}"`);
-            const torrentDateFinished = match[5][2];
+            const torrentDateFinished = matchArray[5][6];
             if (torrentDateFinished === undefined || torrentDateFinished === '')
                 throw new Error(`Torrent date done not found in torrent info: "${id}"`);
             const nowDate = Date.now();
-            const parsedFinishDate = Date.parse(torrentDateFinished);
-            this._torrentInfo = {
+            const parsedFinishDate = Date.parse(torrentDateFinished.trim());
+            this.torrentInfo = {
                 id: Number(id),
-                name: torrentName,
-                state: torrentState,
-                location: torrentLocation,
-                percent: Number(torrentPercent),
-                ratio: Number(torrentRatio),
+                name: torrentName.trim(),
+                state: torrentState.trim(),
+                location: torrentLocation.trim(),
+                percent: Number(torrentPercent.trim()),
+                ratio: Number(torrentRatio.trim()),
                 dateDone: this.dateFormat(parsedFinishDate),
                 dateDifference: Math.round((nowDate - parsedFinishDate) / 1000)
             };
-            this._logger.debug(`Torrent ID "${this._torrentInfo.id}" info:`);
-            this._logger.debug(`   Name: "${this._torrentInfo.name}"`);
-            this._logger.debug(`   State: "${this._torrentInfo.state}"`);
-            this._logger.debug(`   Location: "${this._torrentInfo.location}"`);
-            this._logger.debug(`   Percent Done: "${this._torrentInfo.percent}%"`);
-            this._logger.debug(`   Ratio: "${this._torrentInfo.ratio}" | limit: "${this.config.ratioLimit}"`);
-            this._logger.debug(`   Date finished: "${this._torrentInfo.dateDone}"`);
-            this._logger.debug(`   Date Difference: "${this._torrentInfo.dateDifference}" | limit: "${this.config.limitTime}"`);
+            this.logger.debug(`Torrent ID "${this.torrentInfo.id}" info:`);
+            this.logger.debug(`   Name: "${this.torrentInfo.name}"`);
+            this.logger.debug(`   State: "${this.torrentInfo.state}"`);
+            this.logger.debug(`   Location: "${this.torrentInfo.location}"`);
+            this.logger.debug(`   Percent Done: "${this.torrentInfo.percent}%"`);
+            this.logger.debug(`   Ratio: "${this.torrentInfo.ratio}" | limit: "${this.config.ratioLimit}"`);
+            this.logger.debug(`   Date finished: "${this.torrentInfo.dateDone}"`);
+            this.logger.debug(`   Date Difference: "${this.torrentInfo.dateDifference}" | limit: "${this.config.limitTime}"`);
         }
         catch (error) {
-            this._logger.trace(error);
+            this.logger.trace(error);
             throw error;
         }
     }
@@ -24928,7 +24942,7 @@ class Torrentclear {
             return (0, node_child_process_1.execSync)(command, { timeout: 2000, encoding: 'utf8' });
         }
         catch (error) {
-            this._logger.trace(error);
+            this.logger.trace(error);
             throw error;
         }
     }
@@ -24946,7 +24960,7 @@ class Torrentclear {
         catch (error) {
             if (error.code === 'ENOENT')
                 return this.fileOrDirsState.NOTFOUND;
-            this._logger.trace(error);
+            this.logger.trace(error);
             throw error;
         }
     }
