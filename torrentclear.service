@@ -6,7 +6,7 @@ Wants=transmission-daemon.service
 
 [Service]
 ExecStart=/usr/bin/node index.js
-WorkingDirectory=/opt/torrentclear/dist
+WorkingDirectory=/opt/torrentclear
 SyslogIdentifier=torrentclear
 Restart=on-failure
 User=root
