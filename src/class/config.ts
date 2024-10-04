@@ -10,13 +10,13 @@ import nconf from 'nconf';
  */
 class Config {
   /**
-   * Path to root application dir
-   */
-  private readonly _rootPath: string;
-  /**
    * Nconf implements
    */
   private readonly nconf: typeof nconf = nconf;
+  /**
+   * Path to root application dir
+   */
+  private readonly _rootPath: string;
   /**
    * Development mode status
    * if development = true
@@ -184,10 +184,10 @@ class Config {
    * @param config_file_path - optional `config.json` file path
    */
   private init(): void {
-    const configFile: string = normalize(`${this._rootPath}/config.json`);
+    const configFile: string = normalize(`${this.rootPath}/config.json`);
     this.nconf.env();
     this.nconf.file('config', configFile);
-    this.nconf.file('package', normalize(`${this._rootPath}/package.json`));
+    this.nconf.file('package', normalize(`${this.rootPath}/package.json`));
     this.nconf.defaults({
       node_env: 'production',
       log_level: 'info',
