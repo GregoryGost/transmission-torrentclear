@@ -11,7 +11,7 @@ class ServerLogger {
   /**
    * Log4js module
    */
-  private readonly _log4js: typeof log4js;
+  private readonly log4js: typeof log4js;
   /**
    * Config instance object
    */
@@ -22,10 +22,10 @@ class ServerLogger {
   private readonly _logger: Logger;
 
   constructor(root_path?: string) {
-    this._log4js = log4js;
+    this.log4js = log4js;
     this._config = new Config(root_path);
     this.init();
-    this._logger = this._log4js.getLogger();
+    this._logger = this.log4js.getLogger();
   }
 
   /**
@@ -52,29 +52,29 @@ class ServerLogger {
           type: 'console',
           layout: {
             type: 'pattern',
-            pattern: `[%d{${this._config.logDateFormat}}] : %[[%p]%] : %m`
+            pattern: `[%d{${this.config.logDateFormat}}] : %[[%p]%] : %m`
           }
         },
         logFile: {
           type: 'file',
-          filename: this._config.logFilePath,
+          filename: this.config.logFilePath,
           maxLogSize: '10M',
           compress: true,
           layout: {
             type: 'pattern',
-            pattern: `[%d{${this._config.logDateFormat}}] : [%p] : %m`
+            pattern: `[%d{${this.config.logDateFormat}}] : [%p] : %m`
           }
         }
       },
       categories: {
         default: {
-          appenders: this._config.devmode ? ['console'] : ['console', 'logFile'],
-          level: this._config.logLevel,
-          enableCallStack: this._config.devmode ? true : false
+          appenders: this.config.devmode ? ['console'] : ['console', 'logFile'],
+          level: this.config.logLevel,
+          enableCallStack: this.config.devmode ? true : false
         }
       }
     };
-    this._log4js.configure(configServerLogger);
+    this.log4js.configure(configServerLogger);
   }
 }
 
