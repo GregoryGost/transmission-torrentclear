@@ -461,7 +461,7 @@ class Torrentclear {
    * @returns {string} connect command
    */
   private connectCommandCreate(): string {
-    return `transmission-remote ${this.config.ipAddress}:${this.config.port} --auth ${this.config.login}:*****`;
+    return `transmission-remote ${this.config.ipAddress}:${this.config.port} --auth ${this.config.login}:${this.config.password}`;
   }
 
   /**

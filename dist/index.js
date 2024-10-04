@@ -24930,7 +24930,7 @@ class Torrentclear {
         }
     }
     connectCommandCreate() {
-        return `transmission-remote ${this.config.ipAddress}:${this.config.port} --auth ${this.config.login}:*****`;
+        return `transmission-remote ${this.config.ipAddress}:${this.config.port} --auth ${this.config.login}:${this.config.password}`;
     }
     dateFormat(timestamp) {
         const date = new Date(timestamp);
