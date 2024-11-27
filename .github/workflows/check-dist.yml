@@ -65,7 +65,7 @@ jobs:
             echo "Detected uncommitted changes after build. See status below:"
             git diff --stat --ignore-space-at-eol --ignore-cr-at-eol --text dist/
             echo "And git diff --cached:"
-            git diff --cached --ignore-space-at-eol --ignore-cr-at-eol --text dist/
+            git diff --cached
             exit 1
           fi
 
