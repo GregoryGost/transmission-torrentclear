@@ -1,7 +1,6 @@
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { dirname, normalize, join, resolve } from 'node:path';
 import { existsSync } from 'node:fs';
-import { cpus } from 'node:os';
 import nconf from 'nconf';
 
 /**
@@ -68,11 +67,11 @@ class Config {
   /**
    * Transmission-daemon access login
    */
-  private readonly _login: string | undefined;
+  private readonly _login: string;
   /**
    * Transmission-daemon access password
    */
-  private readonly _password: string | undefined;
+  private readonly _password: string;
   /**
    * Torrent limit time
    * After how many days should the torrent be deleted even if it has not reached the distribution coefficient = 2
@@ -91,29 +90,26 @@ class Config {
   /**
    * Transmission setting "ratio-limit"
    * If `"ratio-limit-enabled": true`
-   * else default 2
+   * else default `2.0`
    */
-  ratioLimit = 2;
+  ratioLimit = 2.0;
 
   constructor(root_path?: string) {
-    process.env.UV_THREADPOOL_SIZE = cpus().length.toString();
-    //
     this._rootPath = root_path ?? Config.getRootDir();
     this.init();
-    this._login = this.getParam('login');
-    this._password = this.getParam('password');
     this._devmode = this.getParam('node_env') === 'development';
     this._appVersion = this.getParam('version');
     this._logLevel = this._devmode ? 'trace' : this.getParam('log_level');
     this._dateFormat = this.getParam('date_format');
     this._logDateFormat = this.getParam('log_date_format');
     this._logFilePath = this.getParam('log_file_path');
+    this._login = this.getParam('login');
+    this._password = this.getParam('password');
     this._ipAddress = this.getParam('ip_address');
     this._port = parseInt(this.getParam('tcp_port'), 10);
     this._limitTime = parseInt(this.getParam('limit_time'), 10);
     this._settingsFilePath = this.getParam('settings_file_path');
     this.setRatio();
-    this.check();
   }
 
   get rootPath(): string {
@@ -152,11 +148,11 @@ class Config {
     return this._port;
   }
 
-  get login(): string | undefined {
+  get login(): string {
     return this._login;
   }
 
-  get password(): string | undefined {
+  get password(): string {
     return this._password;
   }
 
@@ -175,9 +171,12 @@ class Config {
    */
   private init(): void {
     const configFile: string = normalize(`${this.rootPath}/config.json`);
+    const packageFile: string = normalize(`${this.rootPath}/package.json`);
+    this.checkFileExists(configFile);
+    this.checkFileExists(packageFile);
     this.nconf.env();
     this.nconf.file('config', configFile);
-    this.nconf.file('package', normalize(`${this.rootPath}/package.json`));
+    this.nconf.file('package', packageFile);
     this.nconf.defaults({
       node_env: 'production',
       log_level: 'info',
@@ -189,11 +188,11 @@ class Config {
       limit_time: '604800',
       settings_file_path: '/etc/transmission-daemon/settings.json'
     });
-    this.nconf.load();
-    this.settingsFileExists();
-    const settingFile: string = normalize(this.getParam('settings_file_path'));
+    const settingFilePath: string = this.getParam('settings_file_path');
+    const settingFile: string = normalize(settingFilePath);
+    this.checkFileExists(settingFile);
     this.nconf.file('transmission', settingFile);
-    this.nconf.load();
+    // this.check();
   }
 
   /**
@@ -201,29 +200,29 @@ class Config {
    */
   private setRatio(): void {
     this.ratioEnabled = Boolean(this.getParam('ratio-limit-enabled'));
-    if (this.ratioEnabled) this.ratioLimit = parseFloat(this.getParam('ratio-limit'));
+    const ratioLimit: string = this.getParam('ratio-limit');
+    if (this.ratioEnabled) this.ratioLimit = parseFloat(ratioLimit);
   }
 
   /**
    * Check login or password not found
    */
-  check(): void {
-    const login: string = this.getParam('login');
-    const password: string = this.getParam('password');
-    if (login === undefined || login === '' || password === undefined || password === '') {
-      throw new Error('Login or password must be filled in config.json file or Environment');
-    }
-  }
+  // check(): void {
+  //   const login: string = this.getParam('login');
+  //   const password: string = this.getParam('password');
+  //   if (login === '' || password === '') {
+  //     throw new Error('Login or password must be filled in config.json file or Environment');
+  //   }
+  // }
 
   /**
-   * Check exists transmission `settings.json` file
+   * Check exists any file
    */
-  settingsFileExists(): void {
-    const settingsFilePath: string = normalize(this.getParam('settings_file_path'));
-    if (!existsSync(settingsFilePath)) {
-      const relativeSettingsPath: string = resolve(settingsFilePath);
-      if (!existsSync(relativeSettingsPath)) {
-        throw new Error(`Transmission settings file not found on path ${settingsFilePath}`);
+  checkFileExists(file_path: string): void {
+    if (!existsSync(file_path)) {
+      const relativePath: string = resolve(file_path) as string;
+      if (!existsSync(relativePath)) {
+        throw new Error(`File not found on path "${file_path}" or relative path "${relativePath}"`);
       }
     }
   }
@@ -233,27 +232,30 @@ class Config {
    * @returns {string} application root path
    */
   private static getRootDir(): string {
-    const filename: string = fileURLToPath(pathToFileURL(__filename).toString());
+    const filename: string = fileURLToPath(String(pathToFileURL(__filename)));
     const dir = dirname(filename);
     let currentDir: string = dir;
     while (!existsSync(join(currentDir, 'package.json'))) {
       currentDir = join(currentDir, '..');
     }
-    return normalize(currentDir);
+    return String(normalize(currentDir));
   }
 
   /**
    * Get param value
-   * @param param_name - parameter name
-   * @returns parameter value
+   * @param {string} param_name - parameter name
+   * @returns {string} parameter value
    */
-  private getParam(param_name: string): string {
+  getParam(param_name: string): string {
     // From config file. Example: login | log_level
-    let param = this.nconf.get(param_name);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let param: any = this.nconf.get(param_name);
     // Else not found from config file, get from Environment (uppercase).
     // Example: LOGIN | LOG_LEVEL
-    if (param === undefined) param = this.nconf.get(param_name.toUpperCase());
-    return param;
+    if (param === undefined || param === '') param = this.nconf.get(param_name.toUpperCase());
+    if (param === undefined || param === '')
+      throw new Error(`Parameter "${param_name}" incorrect value "${param}" of type "${typeof param}"`);
+    return String(param);
   }
 }
 

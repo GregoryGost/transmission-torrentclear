@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /**
@@ -28,7 +30,7 @@ describe('torrentclear.ts - Positive tests', () => {
   /**
    * Instance test
    */
-  it('Torrentclear instance and init params', async () => {
+  it('Torrentclear instance and init params', () => {
     const torrentclear: Torrentclear = new Torrentclear(fakeRootPath);
     expect(torrentclear instanceof Torrentclear).toBe(true);
     expect(torrentclear.torrentInfo).toStrictEqual({
@@ -48,7 +50,7 @@ describe('torrentclear.ts - Positive tests', () => {
   /**
    * Clear OK process test
    */
-  it('Torrentclear - clear process torrent is DIR, date diff', async () => {
+  it('Torrentclear - clear process torrent is DIR, date diff', () => {
     const torrentclear: Torrentclear = new Torrentclear(fakeRootPath);
     //
     jest.spyOn(cproc, 'execSync').mockImplementation((command: string, _options: any): any => {
@@ -140,7 +142,7 @@ LIMITS & BANDWIDTH
       });
     jest.spyOn(torrentclear.logger, 'trace').mockImplementation();
     //
-    await torrentclear.main();
+    torrentclear.main();
     //
     expect(torrentclear.torrentInfo.id).toEqual(35);
     expect(torrentclear.torrentInfo.name).toEqual('Шерлок Холмс S01 Serial WEB-DL (1080p)');
@@ -206,7 +208,7 @@ LIMITS & BANDWIDTH
     expect(torrentclear.torrentSuccessCount).toBe(1);
     expect(torrentclear.torrentIDs).toStrictEqual([35]);
   });
-  it('Torrentclear - clear process torrent is DIR, ratio', async () => {
+  it('Torrentclear - clear process torrent is DIR, ratio', () => {
     const torrentclear: Torrentclear = new Torrentclear(fakeRootPath);
     //
     jest.spyOn(cproc, 'execSync').mockImplementation((command: string, _options: any): any => {
@@ -298,7 +300,7 @@ LIMITS & BANDWIDTH
       });
     jest.spyOn(torrentclear.logger, 'trace').mockImplementation();
     //
-    await torrentclear.main();
+    torrentclear.main();
     //
     expect(torrentclear.torrentInfo.id).toEqual(35);
     expect(torrentclear.torrentInfo.name).toEqual('Шерлок Холмс S01 Serial WEB-DL (1080p)');
@@ -363,7 +365,7 @@ LIMITS & BANDWIDTH
     expect(torrentclear.torrentSuccessCount).toBe(1);
     expect(torrentclear.torrentIDs).toStrictEqual([35]);
   });
-  it('Torrentclear - clear process torrent is FILE, date diff', async () => {
+  it('Torrentclear - clear process torrent is FILE, date diff', () => {
     const torrentclear: Torrentclear = new Torrentclear(fakeRootPath);
     //
     jest.spyOn(cproc, 'execSync').mockImplementation((command: string, _options: any): any => {
@@ -450,7 +452,7 @@ LIMITS & BANDWIDTH
       });
     jest.spyOn(torrentclear.logger, 'trace').mockImplementation();
     //
-    await torrentclear.main();
+    torrentclear.main();
     //
     expect(torrentclear.torrentInfo.id).toEqual(7);
     expect(torrentclear.torrentInfo.name).toEqual('Beacon.23.S02E02.1080p.rus.LostFilm.TV.mkv');
@@ -515,7 +517,7 @@ LIMITS & BANDWIDTH
     expect(torrentclear.torrentSuccessCount).toBe(1);
     expect(torrentclear.torrentIDs).toStrictEqual([7]);
   });
-  it('Torrentclear - clear process torrent is FILE, ratio', async () => {
+  it('Torrentclear - clear process torrent is FILE, ratio', () => {
     const torrentclear: Torrentclear = new Torrentclear(fakeRootPath);
     //
     jest.spyOn(cproc, 'execSync').mockImplementation((command: string, _options: any): any => {
@@ -602,7 +604,7 @@ LIMITS & BANDWIDTH
       });
     jest.spyOn(torrentclear.logger, 'trace').mockImplementation();
     //
-    await torrentclear.main();
+    torrentclear.main();
     //
     expect(torrentclear.torrentInfo.id).toEqual(7);
     expect(torrentclear.torrentInfo.name).toEqual('Beacon.23.S02E02.1080p.rus.LostFilm.TV.mkv');
@@ -667,7 +669,7 @@ LIMITS & BANDWIDTH
     expect(torrentclear.torrentSuccessCount).toBe(1);
     expect(torrentclear.torrentIDs).toStrictEqual([7]);
   });
-  it('Torrentclear - clear process two torrents', async () => {
+  it('Torrentclear - clear process two torrents', () => {
     const torrentclear: Torrentclear = new Torrentclear(fakeRootPath);
     //
     jest.spyOn(cproc, 'execSync').mockImplementation((command: string, _options: any): any => {
@@ -812,7 +814,7 @@ LIMITS & BANDWIDTH
       });
     jest.spyOn(torrentclear.logger, 'trace').mockImplementation();
     //
-    await torrentclear.main();
+    torrentclear.main();
     // Log Error
     expect(logErrorMock).not.toHaveBeenCalled();
     //
@@ -820,7 +822,7 @@ LIMITS & BANDWIDTH
     expect(torrentclear.torrentSuccessCount).toBe(2);
     expect(torrentclear.torrentIDs).toStrictEqual([7, 9]);
   });
-  it('Torrentclear - no torrent downloaded file but torrent exists', async () => {
+  it('Torrentclear - no torrent downloaded file but torrent exists', () => {
     const torrentclear: Torrentclear = new Torrentclear(fakeRootPath);
     //
     jest.spyOn(cproc, 'execSync').mockImplementation((command: string, _options: any): any => {
@@ -913,7 +915,7 @@ LIMITS & BANDWIDTH
     jest.spyOn(torrentclear.logger, 'warn').mockImplementation();
     jest.spyOn(torrentclear.logger, 'trace').mockImplementation();
     //
-    await torrentclear.main();
+    torrentclear.main();
     // log Info
     expect(logInfoMock).toHaveBeenNthCalledWith(4, `IDs found: 17`);
     expect(logInfoMock).toHaveBeenNthCalledWith(6, `TORRENT ID: "17" START PROCESS ...`);
@@ -951,7 +953,7 @@ describe('torrentclear.ts - No action tests', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
-  it('Torrentclear - no torrents', async () => {
+  it('Torrentclear - no torrents', () => {
     const torrentclear: Torrentclear = new Torrentclear(fakeRootPath);
     //
     jest.spyOn(cproc, 'execSync').mockImplementation((command: string, _options: any): any => {
@@ -980,7 +982,7 @@ Sum:                None               0.0     0.0`;
       });
     jest.spyOn(torrentclear.logger, 'trace').mockImplementation();
     //
-    await torrentclear.main();
+    torrentclear.main();
     // log Info
     expect(logInfoMock).toHaveBeenNthCalledWith(4, `Torrents not found`);
     expect(logInfoMock).toHaveBeenNthCalledWith(6, `Completing the torrent verification process`);
@@ -996,7 +998,7 @@ Sum:                None               0.0     0.0`;
     expect(torrentclear.torrentSuccessCount).toBe(0);
     expect(torrentclear.torrentIDs).toStrictEqual([]);
   });
-  it('Torrentclear - no action needed', async () => {
+  it('Torrentclear - no action needed', () => {
     const torrentclear: Torrentclear = new Torrentclear(fakeRootPath);
     //
     jest.spyOn(cproc, 'execSync').mockImplementation((command: string, _options: any): any => {
@@ -1126,7 +1128,7 @@ LIMITS & BANDWIDTH
       });
     jest.spyOn(torrentclear.logger, 'trace').mockImplementation();
     //
-    await torrentclear.main();
+    torrentclear.main();
     // log Info
     expect(logInfoMock).toHaveBeenNthCalledWith(4, `IDs found: 7, 9`);
     expect(logInfoMock).toHaveBeenNthCalledWith(6, `TORRENT ID: "7" START PROCESS ...`);
@@ -1156,7 +1158,7 @@ LIMITS & BANDWIDTH
     expect(torrentclear.torrentSuccessCount).toBe(0);
     expect(torrentclear.torrentIDs).toStrictEqual([7, 9]);
   });
-  it('Torrentclear - not 100% completed', async () => {
+  it('Torrentclear - not 100% completed', () => {
     const torrentclear: Torrentclear = new Torrentclear(fakeRootPath);
     //
     jest.spyOn(cproc, 'execSync').mockImplementation((command: string, _options: any): any => {
@@ -1302,7 +1304,7 @@ LIMITS & BANDWIDTH
       });
     jest.spyOn(torrentclear.logger, 'trace').mockImplementation();
     //
-    await torrentclear.main();
+    torrentclear.main();
     // log Info
     expect(logInfoMock).toHaveBeenNthCalledWith(4, `IDs found: 7, 9`);
     expect(logInfoMock).toHaveBeenNthCalledWith(6, `TORRENT ID: "7" START PROCESS ...`);
@@ -1317,7 +1319,7 @@ LIMITS & BANDWIDTH
     expect(torrentclear.torrentSuccessCount).toBe(0);
     expect(torrentclear.torrentIDs).toStrictEqual([7, 9]);
   });
-  it('Torrentclear - Torrent no file or directory', async () => {
+  it('Torrentclear - Torrent no file or directory', () => {
     const torrentclear: Torrentclear = new Torrentclear(fakeRootPath);
     //
     jest.spyOn(cproc, 'execSync').mockImplementation((command: string, _options: any): any => {
@@ -1407,7 +1409,7 @@ LIMITS & BANDWIDTH
       });
     jest.spyOn(torrentclear.logger, 'trace').mockImplementation();
     //
-    await torrentclear.main();
+    torrentclear.main();
     // log Info
     expect(logInfoMock).toHaveBeenNthCalledWith(4, `IDs found: 7`);
     expect(logInfoMock).toHaveBeenNthCalledWith(6, `TORRENT ID: "7" START PROCESS ...`);
@@ -1446,7 +1448,7 @@ describe('torrentclear.ts - Error tests', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
-  it('Torrentclear - Error torrents list command', async () => {
+  it('Torrentclear - Error torrents list command', () => {
     const torrentclear: Torrentclear = new Torrentclear(fakeRootPath);
     //
     jest.spyOn(cproc, 'execSync').mockImplementation((command: string, _options: any): any => {
@@ -1471,7 +1473,7 @@ describe('torrentclear.ts - Error tests', () => {
       });
     jest.spyOn(torrentclear.logger, 'trace').mockImplementation();
     //
-    await torrentclear.main();
+    torrentclear.main();
     // log Debug
     expect(logDebugMock).toHaveBeenNthCalledWith(
       1,
@@ -1485,7 +1487,7 @@ describe('torrentclear.ts - Error tests', () => {
     expect(torrentclear.torrentSuccessCount).toBe(0);
     expect(torrentclear.torrentIDs).toStrictEqual([]);
   });
-  it('Torrentclear - Error stop torrent command', async () => {
+  it('Torrentclear - Error stop torrent command', () => {
     const torrentclear: Torrentclear = new Torrentclear(fakeRootPath);
     //
     jest.spyOn(cproc, 'execSync').mockImplementation((command: string, _options: any): any => {
@@ -1565,7 +1567,7 @@ LIMITS & BANDWIDTH
       });
     jest.spyOn(torrentclear.logger, 'trace').mockImplementation();
     //
-    await torrentclear.main();
+    torrentclear.main();
     // log Info
     expect(logInfoMock).toHaveBeenNthCalledWith(4, `IDs found: 7`);
     expect(logInfoMock).toHaveBeenNthCalledWith(6, `TORRENT ID: "7" START PROCESS ...`);
@@ -1593,7 +1595,7 @@ LIMITS & BANDWIDTH
     expect(torrentclear.torrentSuccessCount).toBe(0);
     expect(torrentclear.torrentIDs).toStrictEqual([7]);
   });
-  it('Torrentclear - Error remove torrent command', async () => {
+  it('Torrentclear - Error remove torrent command', () => {
     const torrentclear: Torrentclear = new Torrentclear(fakeRootPath);
     //
     jest.spyOn(cproc, 'execSync').mockImplementation((command: string, _options: any): any => {
@@ -1676,7 +1678,7 @@ LIMITS & BANDWIDTH
       });
     jest.spyOn(torrentclear.logger, 'trace').mockImplementation();
     //
-    await torrentclear.main();
+    torrentclear.main();
     // log Info
     expect(logInfoMock).toHaveBeenNthCalledWith(4, `IDs found: 7`);
     expect(logInfoMock).toHaveBeenNthCalledWith(6, `TORRENT ID: "7" START PROCESS ...`);
@@ -1704,7 +1706,7 @@ LIMITS & BANDWIDTH
     expect(torrentclear.torrentSuccessCount).toBe(0);
     expect(torrentclear.torrentIDs).toStrictEqual([7]);
   });
-  it('Torrentclear - Error remove and delete torrent command', async () => {
+  it('Torrentclear - Error remove and delete torrent command', () => {
     const torrentclear: Torrentclear = new Torrentclear(fakeRootPath);
     //
     jest.spyOn(cproc, 'execSync').mockImplementation((command: string, _options: any): any => {
@@ -1791,7 +1793,7 @@ LIMITS & BANDWIDTH
       });
     jest.spyOn(torrentclear.logger, 'trace').mockImplementation();
     //
-    await torrentclear.main();
+    torrentclear.main();
     // log Info
     expect(logInfoMock).toHaveBeenNthCalledWith(4, `IDs found: 35`);
     expect(logInfoMock).toHaveBeenNthCalledWith(6, `TORRENT ID: "35" START PROCESS ...`);
@@ -1819,7 +1821,7 @@ LIMITS & BANDWIDTH
     expect(torrentclear.torrentSuccessCount).toBe(0);
     expect(torrentclear.torrentIDs).toStrictEqual([35]);
   });
-  it('Torrentclear - Error torrent information data (name, state, etc.)', async () => {
+  it('Torrentclear - Error torrent information data (name, state, etc.)', () => {
     const torrentclear: Torrentclear = new Torrentclear(fakeRootPath);
     //
     jest.spyOn(cproc, 'execSync').mockImplementation((command: string, _options: any): any => {
@@ -1850,7 +1852,7 @@ LIMITS & BANDWIDTH
       });
     jest.spyOn(torrentclear.logger, 'trace').mockImplementation();
     //
-    await torrentclear.main();
+    torrentclear.main();
     // log Info
     expect(logInfoMock).toHaveBeenNthCalledWith(4, `IDs found: 7`);
     expect(logInfoMock).toHaveBeenNthCalledWith(6, `TORRENT ID: "7" START PROCESS ...`);
@@ -1876,7 +1878,7 @@ LIMITS & BANDWIDTH
     expect(torrentclear.torrentSuccessCount).toBe(0);
     expect(torrentclear.torrentIDs).toStrictEqual([7]);
   });
-  it('Torrentclear - Error torrent name not found', async () => {
+  it('Torrentclear - Error torrent name not found', () => {
     const torrentclear: Torrentclear = new Torrentclear(fakeRootPath);
     //
     const execSyncMock = jest.spyOn(cproc, 'execSync').mockImplementation((command: string, _options: any): any => {
@@ -1960,14 +1962,14 @@ LIMITS & BANDWIDTH
         return args;
       });
     //
-    await torrentclear.main();
+    torrentclear.main();
     // Log Error
     expect(logErrorMock).toHaveBeenNthCalledWith(1, `Torrent name not found in torrent info: "35"`);
     expect(logErrorMock).toHaveBeenNthCalledWith(2, `Failed to complete torrent verification process`);
     //
     execSyncMock.mockRestore();
   });
-  it('Torrentclear - Error torrent state not found', async () => {
+  it('Torrentclear - Error torrent state not found', () => {
     const torrentclear: Torrentclear = new Torrentclear(fakeRootPath);
     //
     const execSyncMock = jest.spyOn(cproc, 'execSync').mockImplementation((command: string, _options: any): any => {
@@ -2051,14 +2053,14 @@ LIMITS & BANDWIDTH
         return args;
       });
     //
-    await torrentclear.main();
+    torrentclear.main();
     // Log Error
     expect(logErrorMock).toHaveBeenNthCalledWith(1, `Torrent state not found in torrent info: "35"`);
     expect(logErrorMock).toHaveBeenNthCalledWith(2, `Failed to complete torrent verification process`);
     //
     execSyncMock.mockRestore();
   });
-  it('Torrentclear - Error torrent location not found', async () => {
+  it('Torrentclear - Error torrent location not found', () => {
     const torrentclear: Torrentclear = new Torrentclear(fakeRootPath);
     //
     const execSyncMock = jest.spyOn(cproc, 'execSync').mockImplementation((command: string, _options: any): any => {
@@ -2142,14 +2144,14 @@ LIMITS & BANDWIDTH
         return args;
       });
     //
-    await torrentclear.main();
+    torrentclear.main();
     // Log Error
     expect(logErrorMock).toHaveBeenNthCalledWith(1, `Torrent location not found in torrent info: "35"`);
     expect(logErrorMock).toHaveBeenNthCalledWith(2, `Failed to complete torrent verification process`);
     //
     execSyncMock.mockRestore();
   });
-  it('Torrentclear - Error torrent percent not found', async () => {
+  it('Torrentclear - Error torrent percent not found', () => {
     const torrentclear: Torrentclear = new Torrentclear(fakeRootPath);
     //
     const execSyncMock = jest.spyOn(cproc, 'execSync').mockImplementation((command: string, _options: any): any => {
@@ -2233,14 +2235,14 @@ LIMITS & BANDWIDTH
         return args;
       });
     //
-    await torrentclear.main();
+    torrentclear.main();
     // Log Error
     expect(logErrorMock).toHaveBeenNthCalledWith(1, `Torrent percent not found in torrent info: "35"`);
     expect(logErrorMock).toHaveBeenNthCalledWith(2, `Failed to complete torrent verification process`);
     //
     execSyncMock.mockRestore();
   });
-  it('Torrentclear - Error ratio not found', async () => {
+  it('Torrentclear - Error ratio not found', () => {
     const torrentclear: Torrentclear = new Torrentclear(fakeRootPath);
     //
     const execSyncMock = jest.spyOn(cproc, 'execSync').mockImplementation((command: string, _options: any): any => {
@@ -2324,14 +2326,14 @@ LIMITS & BANDWIDTH
         return args;
       });
     //
-    await torrentclear.main();
+    torrentclear.main();
     // Log Error
     expect(logErrorMock).toHaveBeenNthCalledWith(1, `Torrent ratio not found in torrent info: "35"`);
     expect(logErrorMock).toHaveBeenNthCalledWith(2, `Failed to complete torrent verification process`);
     //
     execSyncMock.mockRestore();
   });
-  it('Torrentclear - Error date done not found', async () => {
+  it('Torrentclear - Error date done not found', () => {
     const torrentclear: Torrentclear = new Torrentclear(fakeRootPath);
     //
     const execSyncMock = jest.spyOn(cproc, 'execSync').mockImplementation((command: string, _options: any): any => {
@@ -2415,7 +2417,7 @@ LIMITS & BANDWIDTH
         return args;
       });
     //
-    await torrentclear.main();
+    torrentclear.main();
     // Log Error
     expect(logErrorMock).toHaveBeenNthCalledWith(1, `Torrent date done not found in torrent info: "35"`);
     expect(logErrorMock).toHaveBeenNthCalledWith(2, `Failed to complete torrent verification process`);
@@ -2439,7 +2441,7 @@ describe('torrentclear.ts - deep tests', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
-  it('Torrentclear - Throw Error isFileOrDirectoryOrUnknown', async () => {
+  it('Torrentclear - Throw Error isFileOrDirectoryOrUnknown', () => {
     const torrentclear: Torrentclear = new Torrentclear(fakeRootPath);
     //
     jest.spyOn(cproc, 'execSync').mockImplementation((command: string, _options: any): any => {
@@ -2522,7 +2524,7 @@ LIMITS & BANDWIDTH
         return args;
       });
     //
-    await torrentclear.main();
+    torrentclear.main();
     // Log Error
     expect(logErrorMock).toHaveBeenNthCalledWith(1, `lstatSync error emulation`);
     expect(logErrorMock).toHaveBeenNthCalledWith(2, `Failed to complete torrent verification process`);
