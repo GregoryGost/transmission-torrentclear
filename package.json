@@ -1,6 +1,6 @@
 {
   "name": "@gregory-gost/transmission-torrentclear",
-  "version": "3.0.3",
+  "version": "3.1.0",
   "description": "Torrent clear script for transmission-daemon service",
   "license": "GPL-3",
   "keywords": [
@@ -41,7 +41,7 @@
     "@typescript-eslint/eslint-plugin": "8.14.0",
     "@typescript-eslint/parser": "8.14.0",
     "eslint": "8.57.1",
-    "eslint-plugin-github": "5.1.2",
+    "eslint-plugin-github": "5.1.3",
     "eslint-plugin-jest": "28.9.0",
     "eslint-plugin-jsonc": "2.18.2",
     "eslint-plugin-prettier": "5.2.1",
