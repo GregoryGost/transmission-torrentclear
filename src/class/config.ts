@@ -94,11 +94,6 @@ class Config {
    * else default 2
    */
   ratioLimit = 2;
-  /**
-   * Metrics save file path
-   * Default: `/var/log/transmission/torrentclear_metrics.log`
-   */
-  // private readonly _metricsFilePath: string;
 
   constructor(root_path?: string) {
     process.env.UV_THREADPOOL_SIZE = cpus().length.toString();
@@ -113,10 +108,9 @@ class Config {
     this._dateFormat = this.getParam('date_format');
     this._logDateFormat = this.getParam('log_date_format');
     this._logFilePath = this.getParam('log_file_path');
-    // this._metricsFilePath = this.getParam('metrics_file_path');
     this._ipAddress = this.getParam('ip_address');
-    this._port = Number(this.getParam('tcp_port'));
-    this._limitTime = Number(this.getParam('limit_time'));
+    this._port = parseInt(this.getParam('tcp_port'), 10);
+    this._limitTime = parseInt(this.getParam('limit_time'), 10);
     this._settingsFilePath = this.getParam('settings_file_path');
     this.setRatio();
     this.check();
@@ -166,10 +160,6 @@ class Config {
     return this._password;
   }
 
-  // get metricsFilePath(): string {
-  //   return this._metricsFilePath;
-  // }
-
   get limitTime(): number {
     return this._limitTime;
   }
@@ -192,7 +182,6 @@ class Config {
       node_env: 'production',
       log_level: 'info',
       log_file_path: '/var/log/transmission/torrentclear.log',
-      // metrics_file_path: '/var/log/transmission/torrentclear_metrics.log',
       date_format: 'DD.MM.YYYY_HH:mm:ss', // https://www.npmjs.com/package/moment
       log_date_format: 'dd.MM.yyyy_hh:mm:ss.SSS', // https://www.npmjs.com/package/date-format
       ip_address: '127.0.0.1',
@@ -212,7 +201,7 @@ class Config {
    */
   private setRatio(): void {
     this.ratioEnabled = Boolean(this.getParam('ratio-limit-enabled'));
-    if (this.ratioEnabled) this.ratioLimit = Number(this.getParam('ratio-limit'));
+    if (this.ratioEnabled) this.ratioLimit = parseFloat(this.getParam('ratio-limit'));
   }
 
   /**
