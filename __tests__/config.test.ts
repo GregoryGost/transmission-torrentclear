@@ -3,7 +3,7 @@
  * Unit tests for src/class/config.ts
  */
 import { cwd } from 'node:process';
-import { normalize, join } from 'node:path';
+import { normalize, join, resolve } from 'node:path';
 //
 import { Config } from '../src/class/config';
 
@@ -14,7 +14,7 @@ describe('config.ts', () => {
   /**
    * Instance test
    */
-  it('config instance', async () => {
+  it('config instance', () => {
     const testRootPath: string = normalize(join(cwd(), '__tests__', 'configs'));
     const config: Config = new Config(testRootPath);
     expect(config instanceof Config).toBe(true);
@@ -22,7 +22,7 @@ describe('config.ts', () => {
   /**
    * Throw exceptions
    */
-  it('config init error settings file', async () => {
+  it('config init error config file', () => {
     // no config file
     try {
       new Config();
@@ -30,23 +30,23 @@ describe('config.ts', () => {
       // eslint-disable-next-line jest/no-conditional-expect
       expect(error).toHaveProperty(
         'message',
-        `Transmission settings file not found on path ${normalize('/etc/transmission-daemon/settings.json')}`
+        `File not found on path "${normalize(join(cwd(), 'config.json'))}" or relative path "${resolve(normalize(join(cwd(), 'config.json')))}"`
       );
     }
   });
-  it('config init error login', async () => {
+  it('config init error login', () => {
     const testRootPath: string = normalize(join(cwd(), '__tests__', 'configs', 'no_login'));
     try {
       new Config(testRootPath);
     } catch (error) {
       // eslint-disable-next-line jest/no-conditional-expect
-      expect(error).toHaveProperty('message', 'Login or password must be filled in config.json file or Environment');
+      expect(error).toHaveProperty('message', 'Parameter "login" incorrect value "undefined" of type "undefined"');
     }
   });
   /**
    * Get all parameters test
    */
-  it('get base parameters', async () => {
+  it('get base parameters', () => {
     const testRootPath: string = normalize(join(cwd(), '__tests__', 'configs'));
     const config: Config = new Config(testRootPath);
     //
@@ -65,7 +65,7 @@ describe('config.ts', () => {
     expect(config.limitTime).toBe(100000);
     expect(config.settingsFilePath).toBe('./__tests__/settings.json');
   });
-  it('get specific parameters if prod', async () => {
+  it('get specific parameters if prod', () => {
     const testRootPath: string = normalize(join(cwd(), '__tests__', 'configs', 'ak_prod'));
     const config: Config = new Config(testRootPath);
     //

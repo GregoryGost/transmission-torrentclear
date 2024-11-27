@@ -6,7 +6,6 @@ import type { Logger } from 'log4js';
 //
 import { Config } from './config';
 import { ServerLogger } from './server-logger';
-// import { Metrics } from './metrics';
 //
 import type { TorrentInfoI, FileOrDirsStateI } from '../types';
 
@@ -138,13 +137,13 @@ class Torrentclear {
   /**
    * Main function. Start program.
    */
-  async main(): Promise<void> {
+  main(): void {
     try {
       this.startInfo();
       // get torrents ID from torrents list
-      await this.getIDs();
+      this.getIDs();
       // check torrents
-      await this.torrentsProcess();
+      this.torrentsProcess();
       this.endInfo();
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
@@ -179,12 +178,12 @@ class Torrentclear {
    * Get all torrents IDs from transmission-daemon
    * @set this `torrentIDs` - IDs array list
    */
-  private async getIDs(): Promise<void> {
+  private getIDs(): void {
     try {
       // List all torrents
       const command = `${this.connect} --list`;
       this.logger.debug(`Run command: "${command}"`);
-      const execResult: string = await this.command(command);
+      const execResult: string = this.command(command);
       const resultTorrentsList: RegExpMatchArray | null = execResult.toString().match(/^\s+(\d+)\s.*?$/gim);
       if (resultTorrentsList === null || resultTorrentsList.length < 1) {
         this.logger.info(`Torrents not found`);
@@ -211,7 +210,7 @@ class Torrentclear {
   /**
    * Checking torrents. If the deletion conditions match, then the torrent is deleted
    */
-  private async torrentsProcess(): Promise<void> {
+  private torrentsProcess(): void {
     try {
       // If torrents > 0
       if (this.torrentIDs.length > 0) {
@@ -222,7 +221,7 @@ class Torrentclear {
           );
           this.logger.info(`TORRENT ID: "${id}" START PROCESS ...`);
           // get torrent information
-          await this.getTorrentInfo(id);
+          this.getTorrentInfo(id);
           // Only done torrents
           if (this.torrentInfo.percent === 100) {
             // If OK. Check Ratio
@@ -230,7 +229,7 @@ class Torrentclear {
             if (checkRatio) {
               // ==> ACTION: Delete on Ratio
               this.logger.debug(`==> ACTION: Torrent delete on Ratio Limit`);
-              await this.clearTorrent();
+              this.clearTorrent();
               this.torrentSuccessCount++;
               this.logger.info(
                 `Stopping and deleting a torrent "${this.torrentInfo.name}" by ratio limit completed successfully`
@@ -242,7 +241,7 @@ class Torrentclear {
               if (checkDateDifference) {
                 // ==> ACTION: Delete on Date Difference
                 this.logger.debug(`==> ACTION: Torrent delete on Date Difference`);
-                await this.clearTorrent();
+                this.clearTorrent();
                 this.torrentSuccessCount++;
                 this.logger.info(
                   `Stopping and deleting a torrent "${this.torrentInfo.name}" by datetime limit completed successfully`
@@ -268,28 +267,28 @@ class Torrentclear {
    * Check torrent is a File or a Directory.
    * If is a File check extensions (mkv, avi, mp4 defaults)
    */
-  private async clearTorrent(): Promise<void> {
+  private clearTorrent(): void {
     try {
-      const torrentPath: string = normalize(`${this.torrentInfo.location}/${this.torrentInfo.name}`);
+      const torrentPath: string = normalize(`${this.torrentInfo.location}/${this.torrentInfo.name}`) as string;
       this.logger.debug(`normalized torrentPath: "${torrentPath}"`);
-      const fileOrDir: number = await this.isFileOrDirectoryOrUnknown(torrentPath);
+      const fileOrDir: number = this.isFileOrDirectoryOrUnknown(torrentPath);
       if (fileOrDir === this.fileOrDirsState.FILE) {
         // Is File
         this.logger.info(`Torrent: "${this.torrentInfo.name}" is a FILE`);
-        await this.torrentStop();
-        await this.torrentRemove();
+        this.torrentStop();
+        this.torrentRemove();
       } else if (fileOrDir === this.fileOrDirsState.DIR) {
         // Is Directory
         this.logger.info(`Torrent: "${this.torrentInfo.name}" is a DIRECTORY`);
         // If Directory: Remove torrent and delete folder with files inside
-        await this.torrentStop();
-        await this.torrentRemoveAndDelete();
+        this.torrentStop();
+        this.torrentRemoveAndDelete();
       } else if (fileOrDir === this.fileOrDirsState.NOTFOUND) {
         // File not Found into target directory
         this.logger.warn(`Torrent: "${this.torrentInfo.name}" FILE NOT FOUND`);
         // Only remove torrent
-        await this.torrentStop();
-        await this.torrentRemove();
+        this.torrentStop();
+        this.torrentRemove();
       } else {
         // Unknown type: no next action
         this.logger.debug(`Torrent: "${this.torrentInfo.name}" is neither a file or a directory`);
@@ -303,12 +302,12 @@ class Torrentclear {
   /**
    * Stop torrent command execution.
    */
-  private async torrentStop(): Promise<void> {
+  private torrentStop(): void {
     try {
       const command = `${this.connect} --torrent ${this.torrentInfo.id} --stop`;
       this.logger.debug(`Stop torrent: (${this.torrentInfo.id}) "${this.torrentInfo.name}"`);
       this.logger.debug(`Run command: "${command}"`);
-      let execResultStop: string = await this.command(command);
+      let execResultStop: string = this.command(command);
       execResultStop = execResultStop.replace(/(\r\n|\n|\r)/gm, '');
       this.logger.debug(`execResultStop: ${execResultStop}`);
       if (!this.regexSuccess.test(execResultStop)) {
@@ -326,12 +325,12 @@ class Torrentclear {
    * Remove torrent command execution.
    * DOES NOT DELETE FILES (removes only from the transmission)
    */
-  private async torrentRemove(): Promise<void> {
+  private torrentRemove(): void {
     try {
       const command = `${this.connect} --torrent ${this.torrentInfo.id} --remove`;
       this.logger.debug(`Remove torrent without deleting file: (${this.torrentInfo.id}) "${this.torrentInfo.name}"`);
       this.logger.debug(`Run command: "${command}"`);
-      let execResult: string = await this.command(command);
+      let execResult: string = this.command(command);
       execResult = execResult.replace(/(\r\n|\n|\r)/gm, '');
       this.logger.debug(`execResultRemove: ${execResult}`);
       if (!this.regexSuccess.test(execResult)) {
@@ -349,12 +348,12 @@ class Torrentclear {
    * Remove torrent command execution.
    * DELETES INCLUDING ALL TORRENT FILES
    */
-  private async torrentRemoveAndDelete(): Promise<void> {
+  private torrentRemoveAndDelete(): void {
     try {
       const command = `${this.connect} --torrent ${this.torrentInfo.id} --remove-and-delete`;
       this.logger.debug(`Remove torrent with deleting file: (${this.torrentInfo.id}) "${this.torrentInfo.name}"`);
       this.logger.debug(`Run command: "${command}"`);
-      let execResult: string = await this.command(command);
+      let execResult: string = this.command(command);
       execResult = execResult.replace(/(\r\n|\n|\r)/gm, '');
       this.logger.debug(`execResultRemoveAndDelete: ${execResult}`);
       if (!this.regexSuccess.test(execResult)) {
@@ -403,11 +402,11 @@ class Torrentclear {
    * @param {number} id - Torrent ID
    * @set this `_torrentInfo` - Torrent info object
    */
-  private async getTorrentInfo(id: number): Promise<void> {
+  private getTorrentInfo(id: number): void {
     try {
       const command = `${this.connect} --torrent ${id} --info`;
       this.logger.debug(`Run command: "${command}"`);
-      const execResult: string = await this.command(command);
+      const execResult: string = this.command(command);
       const matchAll: IterableIterator<RegExpMatchArray> = execResult.toString().matchAll(this.regexTorrentInfo);
       const matchArray: RegExpMatchArray[] = Array.from(matchAll);
       if (matchArray.length < 1) throw new Error(`Torrent info data is EMPTY`);
@@ -481,9 +480,9 @@ class Torrentclear {
    * @param {string} command - Command to a connect
    * @returns {string} Execution result
    */
-  private async command(command: string): Promise<string> {
+  private command(command: string): string {
     try {
-      return execSync(command, { timeout: 2000, encoding: 'utf8' });
+      return execSync(command, { timeout: 2000, encoding: 'utf8' }) as string;
     } catch (error) {
       this.logger.trace(error);
       throw error;
@@ -495,7 +494,7 @@ class Torrentclear {
    * @param {string} path - torrent path
    * @returns {number} `FILE: 1` torrent is File, `DIR: 2` torrent is Directory, `NOTFOUND: 3`, `UNKNOWN: 4` - not File, not Directory
    */
-  private async isFileOrDirectoryOrUnknown(path: string): Promise<number> {
+  private isFileOrDirectoryOrUnknown(path: string): number {
     try {
       const stat: Stats = lstatSync(path);
       const isFile: boolean = stat.isFile();
