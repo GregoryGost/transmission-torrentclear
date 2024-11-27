@@ -96,15 +96,14 @@ node -v
 v20.17.0
 ```
 
-Далее создаем папку под приложение, делаем файл исполняемым. Создаем фейковый файл `package.json` (нужно для корректного
-определения корневой дирректории и нахождения файла конфигурации)
+Далее создаем папку под приложение, скачиваем файлы `index.js` и `package.json`. Делаем файл `index.js` исполняемым.
 
 ```shell
 mkdir /opt/torrentclear
 cd /opt/torrentclear
-wget https://raw.githubusercontent.com/GregoryGost/transmission-torrentclear/refs/heads/main/dist/index.js
+wget -O index.js https://raw.githubusercontent.com/GregoryGost/transmission-torrentclear/refs/heads/main/dist/index.js
+wget -O package.json https://raw.githubusercontent.com/GregoryGost/transmission-torrentclear/refs/heads/main/package.json
 chmod +x index.js
-echo '{"version":"3.0.2"}' > package.json
 ```
 
 ### Конфигурирование
@@ -214,16 +213,18 @@ bash nodesource_setup.sh
 apt update && apt upgrade -y
 ```
 
-Для обновления можно просто перекачать `index.js` файл
+Для обновления можно просто перекачать файлы `index.js` и `package.json`
 
 ```shell
 wget -O index.js https://raw.githubusercontent.com/GregoryGost/transmission-torrentclear/refs/heads/main/dist/index.js
+wget -O package.json https://raw.githubusercontent.com/GregoryGost/transmission-torrentclear/refs/heads/main/package.json
 ```
 
-Если вы хотите обновить из другой ветки, просто поменяйте её название в пути скачивания
+Если вы хотите обновить из другой ветки, просто поменяйте её название в пути скачивания. Пример для ветки `develop`
 
 ```shell
 wget -O index.js https://raw.githubusercontent.com/GregoryGost/transmission-torrentclear/refs/heads/develop/dist/index.js
+wget -O package.json https://raw.githubusercontent.com/GregoryGost/transmission-torrentclear/refs/heads/develop/package.json
 ```
 
 ## Ротация логов
@@ -260,9 +261,9 @@ systemctl status logrotate.service
 проекта не дает никаких гарантий на работоспособность исполняемых файлов, а так же не несет никакой ответственности по
 искам или за нанесенный ущерб.
 
-Этот репозиторий содержит ссылки на все используемые модули и их лицензии. Они собраны в
-[специальный файл лицензий](./dist/licenses.txt). Их авторы самостоятельно несут (или не несут) ответственность за
-качество, стабильность и работу этих модулей.
+Этот репозиторий содержит сторонние модули. Авторы этих модулей самостоятельно несут (или не несут) ответственность за
+качество, стабильность и работу этих модулей и их принципы лицензирования. Используемые модули находятся в зависимостях
+в файле `package.json`
 
 ## Немного о себе
 

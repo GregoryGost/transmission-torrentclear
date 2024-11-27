@@ -1,9 +1,10 @@
+/* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * Unit tests for src/class/server-logger.ts
  */
 import { cwd } from 'node:process';
-import { normalize, join } from 'node:path';
+import { normalize, join, resolve } from 'node:path';
 import type { Level } from 'log4js';
 //
 import { ServerLogger } from '../src/class/server-logger';
@@ -22,15 +23,15 @@ describe('server-logger.ts', () => {
   /**
    * Instance test
    */
-  it('server-logger instance', async () => {
-    const configSettingsFileExistsMock = jest.spyOn(Config.prototype as any, 'settingsFileExists').mockImplementation();
+  it('server-logger instance', () => {
+    const configSettingsFileExistsMock = jest.spyOn(Config.prototype as any, 'checkFileExists').mockImplementation();
     //
     const serverLogger: ServerLogger = new ServerLogger(devConfigPath);
     expect(serverLogger instanceof ServerLogger).toBe(true);
     //
     configSettingsFileExistsMock.mockRestore();
   });
-  it('server-logger instance - default path', async () => {
+  it('server-logger instance - default path', () => {
     // no config file
     try {
       new ServerLogger();
@@ -38,15 +39,15 @@ describe('server-logger.ts', () => {
       // eslint-disable-next-line jest/no-conditional-expect
       expect(error).toHaveProperty(
         'message',
-        `Transmission settings file not found on path ${normalize('/etc/transmission-daemon/settings.json')}`
+        `File not found on path "${normalize(join(cwd(), 'config.json'))}" or relative path "${resolve(normalize(join(cwd(), 'config.json')))}"`
       );
     }
   });
   /**
    * Get config from server logger
    */
-  it('get config and logger from ServerLogger', async () => {
-    const configSettingsFileExistsMock = jest.spyOn(Config.prototype as any, 'settingsFileExists').mockImplementation();
+  it('get config and logger from ServerLogger', () => {
+    const configSettingsFileExistsMock = jest.spyOn(Config.prototype as any, 'checkFileExists').mockImplementation();
     // get config
     const serverLogger: ServerLogger = new ServerLogger(devConfigPath);
     expect(serverLogger.config instanceof Config).toBe(true);
@@ -65,8 +66,8 @@ describe('server-logger.ts', () => {
   /**
    * Dev or Prod config logger
    */
-  it('develop or prod config for logger', async () => {
-    const configSettingsFileExistsMock = jest.spyOn(Config.prototype as any, 'settingsFileExists').mockImplementation();
+  it('develop or prod config for logger', () => {
+    const configSettingsFileExistsMock = jest.spyOn(Config.prototype as any, 'checkFileExists').mockImplementation();
     // develop
     // appenders, level, enableCallStack
     const serverLoggerDev: ServerLogger = new ServerLogger(devConfigPath);
