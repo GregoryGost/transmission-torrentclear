@@ -1,7 +1,3 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /**
  * Unit tests for src/class/torrentclear.ts
  */
