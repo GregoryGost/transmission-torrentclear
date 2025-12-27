@@ -28,7 +28,7 @@ export interface TorrentInfoI {
    */
   location: string;
   /**
-   * Example: `100`
+   * Example: `95.5`
    */
   percent: number;
   /**
