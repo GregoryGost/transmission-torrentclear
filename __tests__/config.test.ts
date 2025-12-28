@@ -1,7 +1,7 @@
 /**
  * Unit tests for src/class/config.ts
  */
-import { cwd } from 'node:process';
+import { cwd, env } from 'node:process';
 import { normalize, join, resolve } from 'node:path';
 //
 import { Config } from '../src/class/config';
@@ -82,5 +82,23 @@ describe('config.ts', () => {
     expect(config.password).toBe('1234567890123456789');
     expect(config.limitTime).toBe(604800);
     expect(config.settingsFilePath).toBe('./__tests__/settings.json');
+  });
+  it('TR_SAVE_VERSION_FORMAT for 3.00', () => {
+    env.TR_SAVE_VERSION_FORMAT = undefined;
+    //
+    const testRootPath: string = normalize(join(cwd(), '__tests__', 'configs'));
+    const config: Config = new Config(testRootPath);
+    //
+    expect(config.ratioEnabled).toBe(true);
+    expect(config.ratioLimit).toBe(2.5);
+  });
+  it('TR_SAVE_VERSION_FORMAT for 4.0.0 and greather', () => {
+    env.TR_SAVE_VERSION_FORMAT = '5';
+    //
+    const testRootPath: string = normalize(join(cwd(), '__tests__', 'configs', 'great_4.0.0'));
+    const config: Config = new Config(testRootPath);
+    //
+    expect(config.ratioEnabled).toBe(true);
+    expect(config.ratioLimit).toBe(3.5);
   });
 });
