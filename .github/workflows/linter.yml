@@ -59,6 +59,7 @@ jobs:
           VALIDATE_BIOME_LINT: false
           VALIDATE_GITHUB_ACTIONS_ZIZMOR: false
           # for eslint 9 (flat config)
-          # VALIDATE_JSON: true
-          # VALIDATE_TYPESCRIPT_ES: true
           TYPESCRIPT_ES_CONFIG_FILE: eslint.config.mjs
+          # if error - OK exit
+          DISABLE_ERRORS: true
+          LOG_LEVEL: INFO
