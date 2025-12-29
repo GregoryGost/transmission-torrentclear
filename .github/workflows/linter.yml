@@ -44,7 +44,7 @@ jobs:
 
       - name: Lint Codebase
         id: super-linter
-        uses: super-linter/super-linter/slim@v7.4.0
+        uses: super-linter/super-linter/slim@v8.3.2
         env:
           DEFAULT_BRANCH: develop
           FILTER_REGEX_EXCLUDE: dist/**/*
@@ -55,6 +55,7 @@ jobs:
           VALIDATE_JAVASCRIPT_STANDARD: false
           VALIDATE_TYPESCRIPT_STANDARD: false
           VALIDATE_JSCPD: false
-          # disable temp (remove if eslint up 8 to 9)
-          VALIDATE_JSON: false
-          VALIDATE_TYPESCRIPT_ES: false
+          # for eslint 9 (flat config)
+          VALIDATE_JSON: true
+          VALIDATE_TYPESCRIPT_ES: true
+          TYPESCRIPT_ES_CONFIG_FILE: eslint.config.mjs
