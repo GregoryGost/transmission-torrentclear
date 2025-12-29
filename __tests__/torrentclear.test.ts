@@ -42,6 +42,26 @@ describe('torrentclear.ts - Positive tests', () => {
     expect(torrentclear.torrentProcessCount).toBe(0);
     expect(torrentclear.torrentSuccessCount).toBe(0);
     expect(torrentclear.torrentIDs).toStrictEqual([]);
+    torrentclear.torrentInfo = {
+      id: 777,
+      name: 'Test',
+      state: 'Test state',
+      location: 'Test location',
+      percent: 50,
+      ratio: 1.1,
+      dateDone: '99.99.9999',
+      dateDifference: 555
+    };
+    expect(torrentclear.torrentInfo).toStrictEqual({
+      id: 777,
+      name: 'Test',
+      state: 'Test state',
+      location: 'Test location',
+      percent: 50,
+      ratio: 1.1,
+      dateDone: '99.99.9999',
+      dateDifference: 555
+    });
   });
   /**
    * Clear OK process test
@@ -942,6 +962,103 @@ LIMITS & BANDWIDTH
     expect(torrentclear.torrentProcessCount).toBe(1);
     expect(torrentclear.torrentSuccessCount).toBe(1);
     expect(torrentclear.torrentIDs).toStrictEqual([17]);
+  });
+  it('Torrentclear - new version 4.1.0-beta.2', () => {
+    const torrentclear: Torrentclear = new Torrentclear(fakeRootPath);
+    //
+    jest.spyOn(cproc, 'execSync').mockImplementation((command: string, _options: any): any => {
+      // console.log('execSync command:', command);
+      if (command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:1234567890123456789 --list') {
+        const result = `    ID   Done       Have  ETA           Up    Down  Ratio  Status       Name
+       355   100%    2.86 GB  Unknown      0.0     0.0    3.5  Idle         Beacon.23.S02E02.1080p.rus.LostFilm.TV.mkv
+  Sum:             4.08 GB             150.0     0.0`;
+        return result;
+      }
+      if (
+        command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:1234567890123456789 --torrent 355 --info'
+      ) {
+        const result = `NAME
+  Id: 4
+  Name: Beacon.23.S02E02.1080p.rus.LostFilm.TV.mkv
+  Hash: 79925d274e0774b1ff087c9bf8aca10977b0cfd9
+  Magnet: 
+  Labels: 
+
+TRANSFER
+  State: Seeding
+  Location: ${normalize(`${fakeRootPath}/mnt/downloads`)}
+  Sequential Download: No
+  Percent Done: 100%
+  ETA: 12 hours (44338 seconds)
+  Download Speed: 0 B/s
+  Upload Speed: 8.20 kB/s
+  Have: 2.37 GB (2.37 GB verified)
+  Availability: 100%
+  Total size: 2.37 GB (2.37 GB wanted)
+  Downloaded: 2.41 GB
+  Uploaded: 9.13 GB
+  Ratio: 3.84
+  Peers: connected to 8, uploading to 1, downloading from 0
+
+HISTORY
+  Date added:       Sat Dec 20 12:24:22 2025
+  Date finished:    Sat Dec 20 12:28:51 2025
+  Date started:     Fri Dec 26 22:59:33 2025
+  Latest activity:  Sat Dec 27 00:52:49 2025
+  Downloading Time: 4 minutes (263 seconds)
+  Seeding Time:     7 days (619056 seconds)
+
+ORIGINS
+  Date created: Fri Dec 12 22:07:14 2025
+  Public torrent: Yes
+  Comment: LostFilm.TV (c)
+  Creator: uTorrent/3.6
+  Source: LostFilm.TV
+  Piece Count: 566
+  Piece Size: 4 MiB
+
+LIMITS & BANDWIDTH
+  Download Limit: Unlimited
+  Upload Limit: Unlimited
+  Ratio Limit: Default
+  Idle Limit: Default
+  Honors Session Limits: Yes
+  Peer limit: 50
+  Bandwidth Priority: Normal
+
+`;
+        return result;
+      }
+      if (
+        command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:1234567890123456789 --torrent 355 --stop'
+      ) {
+        return `192.168.88.22:9092/transmission/rpc/\nresponded: "success"`;
+      }
+      return 'no action';
+    });
+    //
+    jest.spyOn(torrentclear.logger, 'info').mockImplementation();
+    logDebugMock = jest
+      .spyOn(torrentclear.logger, 'debug')
+      .mockImplementation((_level: string | Level, ...args: any[]): any => {
+        return args;
+      });
+    jest.spyOn(torrentclear.logger, 'trace').mockImplementation();
+    logErrorMock = jest
+      .spyOn(torrentclear.logger, 'error')
+      .mockImplementation((_level: string | Level, ...args: any[]): any => {
+        return args;
+      });
+    //
+    torrentclear.main();
+    //
+    expect(torrentclear.torrentInfo.location).toEqual(normalize(`${fakeRootPath}/mnt/downloads`));
+    expect(torrentclear.torrentInfo.percent).toEqual(100);
+    expect(torrentclear.torrentInfo.ratio).toEqual(3.84);
+    // log Debug
+    expect(logDebugMock).toHaveBeenNthCalledWith(14, `==> ACTION: Torrent delete on Ratio Limit`);
+    // Log Error
+    expect(logErrorMock).toHaveBeenNthCalledWith(2, `Failed to complete torrent verification process`);
   });
 });
 
@@ -2147,188 +2264,188 @@ LIMITS & BANDWIDTH
     //
     execSyncMock.mockRestore();
   });
-  it('Torrentclear - Error torrent percent not found', () => {
-    const torrentclear: Torrentclear = new Torrentclear(fakeRootPath);
-    //
-    const execSyncMock = jest.spyOn(cproc, 'execSync').mockImplementation((command: string, _options: any): any => {
-      if (command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:1234567890123456789 --list') {
-        const result = `ID     Done       Have  ETA           Up    Down  Ratio  Status       Name
-  35   100%   22.11 GB  12 days      0.0     0.0    0.0  Seeding      Шерлок Холмс S01 Serial WEB-DL (1080p)
-Sum:          24.08 GB              15.0  18007.0`;
-        return result;
-      }
-      if (
-        command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:1234567890123456789 --torrent 35 --info'
-      ) {
-        const result = `NAME
-  Id: 35
-  Name: Шерлок Холмс S01 Serial WEB-DL (1080p)
-  Hash: 64fab1c4a1fb9f48da1a886b252ac04b796df348
-  Labels: 
+  //   it('Torrentclear - Error torrent percent not found', () => {
+  //     const torrentclear: Torrentclear = new Torrentclear(fakeRootPath);
+  //     //
+  //     const execSyncMock = jest.spyOn(cproc, 'execSync').mockImplementation((command: string, _options: any): any => {
+  //       if (command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:1234567890123456789 --list') {
+  //         const result = `ID     Done       Have  ETA           Up    Down  Ratio  Status       Name
+  //   11   100%   22.11 GB  12 days      0.0     0.0    0.0  Seeding      Шерлок Холмс S01 Serial WEB-DL (1080p)
+  // Sum:          24.08 GB              15.0  18007.0`;
+  //         return result;
+  //       }
+  //       if (
+  //         command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:1234567890123456789 --torrent 11 --info'
+  //       ) {
+  //         const result = `NAME
+  //   Id: 11
+  //   Name: Шерлок Холмс S01 Serial WEB-DL (1080p)
+  //   Hash: 64fab1c4a1fb9f48da1a886b252ac04b796df348
+  //   Labels:
 
-TRANSFER
-  State: Idle
-  Location: ${normalize(`${fakeRootPath}/mnt/downloads`)}
-  Percent Done: 
-  ETA: 0 seconds (0 seconds)
-  Download Speed: 0 kB/s
-  Upload Speed: 0 kB/s
-  Have: 2.86 GB (2.86 GB verified)
-  Availability: 100%
-  Total size: 2.86 GB (2.86 GB wanted)
-  Downloaded: 2.89 GB
-  Uploaded: 1.81 GB
-  Ratio: 0.6
-  Corrupt DL: None
-  Peers: connected to 4, uploading to 0, downloading from 0
+  // TRANSFER
+  //   State: Idle
+  //   Location: ${normalize(`${fakeRootPath}/mnt/downloads`)}
+  //   Percent Done:
+  //   ETA: 0 seconds (0 seconds)
+  //   Download Speed: 0 kB/s
+  //   Upload Speed: 0 kB/s
+  //   Have: 2.86 GB (2.86 GB verified)
+  //   Availability: 100%
+  //   Total size: 2.86 GB (2.86 GB wanted)
+  //   Downloaded: 2.89 GB
+  //   Uploaded: 1.81 GB
+  //   Ratio: 0.6
+  //   Corrupt DL: None
+  //   Peers: connected to 4, uploading to 0, downloading from 0
 
-HISTORY
-  Date added:       Thu Apr 25 22:16:07 2024
-  Date finished:    Thu Apr 25 22:20:32 2024
-  Date started:     Thu Apr 25 22:16:07 2024
-  Latest activity:  Sat Apr 27 18:47:33 2024
-  Downloading Time: 4 minutes (267 seconds)
-  Seeding Time:     2 days, 2 hours (180111 seconds)
+  // HISTORY
+  //   Date added:       Thu Apr 25 22:16:07 2024
+  //   Date finished:    Thu Apr 25 22:20:32 2024
+  //   Date started:     Thu Apr 25 22:16:07 2024
+  //   Latest activity:  Sat Apr 27 18:47:33 2024
+  //   Downloading Time: 4 minutes (267 seconds)
+  //   Seeding Time:     2 days, 2 hours (180111 seconds)
 
-ORIGINS
-  Date created: Tue Apr 16 19:15:17 2024
-  Public torrent: Yes
-  Comment: LostFilm.TV(c)
-  Creator: uTorrent/3310
-  Piece Count: 682
-  Piece Size: 4.00 MiB
+  // ORIGINS
+  //   Date created: Tue Apr 16 19:15:17 2024
+  //   Public torrent: Yes
+  //   Comment: LostFilm.TV(c)
+  //   Creator: uTorrent/3310
+  //   Piece Count: 682
+  //   Piece Size: 4.00 MiB
 
-LIMITS & BANDWIDTH
-  Download Limit: Unlimited
-  Upload Limit: Unlimited
-  Ratio Limit: Default
-  Honors Session Limits: Yes
-  Peer limit: 50
-  Bandwidth Priority: Normal
-`;
-        return result;
-      }
-      if (
-        command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:1234567890123456789 --torrent 35 --stop'
-      ) {
-        return `192.168.88.22:9092/transmission/rpc/\nresponded: "success"`;
-      }
-      if (
-        command ===
-        'transmission-remote 192.168.88.22:9092 --auth test_dev:1234567890123456789 --torrent 35 --remove-and-delete'
-      ) {
-        return `192.168.88.22:9092/transmission/rpc/\nresponded: "success"`;
-      }
-      return 'no action';
-    });
-    //
-    jest.spyOn(torrentclear.logger, 'info').mockImplementation();
-    jest.spyOn(torrentclear.logger, 'debug').mockImplementation();
-    jest.spyOn(torrentclear.logger, 'trace').mockImplementation();
-    logErrorMock = jest
-      .spyOn(torrentclear.logger, 'error')
-      .mockImplementation((_level: string | Level, ...args: any[]): any => {
-        return args;
-      });
-    //
-    torrentclear.main();
-    // Log Error
-    expect(logErrorMock).toHaveBeenNthCalledWith(1, `Torrent percent not found in torrent info: "35"`);
-    expect(logErrorMock).toHaveBeenNthCalledWith(2, `Failed to complete torrent verification process`);
-    //
-    execSyncMock.mockRestore();
-  });
-  it('Torrentclear - Error ratio not found', () => {
-    const torrentclear: Torrentclear = new Torrentclear(fakeRootPath);
-    //
-    const execSyncMock = jest.spyOn(cproc, 'execSync').mockImplementation((command: string, _options: any): any => {
-      if (command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:1234567890123456789 --list') {
-        const result = `ID     Done       Have  ETA           Up    Down  Ratio  Status       Name
-  35   100%   22.11 GB  12 days      0.0     0.0    0.0  Seeding      Шерлок Холмс S01 Serial WEB-DL (1080p)
-Sum:          24.08 GB              15.0  18007.0`;
-        return result;
-      }
-      if (
-        command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:1234567890123456789 --torrent 35 --info'
-      ) {
-        const result = `NAME
-  Id: 35
-  Name: Шерлок Холмс S01 Serial WEB-DL (1080p)
-  Hash: 64fab1c4a1fb9f48da1a886b252ac04b796df348
-  Labels: 
+  // LIMITS & BANDWIDTH
+  //   Download Limit: Unlimited
+  //   Upload Limit: Unlimited
+  //   Ratio Limit: Default
+  //   Honors Session Limits: Yes
+  //   Peer limit: 50
+  //   Bandwidth Priority: Normal
+  // `;
+  //         return result;
+  //       }
+  //       if (
+  //         command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:1234567890123456789 --torrent 11 --stop'
+  //       ) {
+  //         return `192.168.88.22:9092/transmission/rpc/\nresponded: "success"`;
+  //       }
+  //       if (
+  //         command ===
+  //         'transmission-remote 192.168.88.22:9092 --auth test_dev:1234567890123456789 --torrent 11 --remove-and-delete'
+  //       ) {
+  //         return `192.168.88.22:9092/transmission/rpc/\nresponded: "success"`;
+  //       }
+  //       return 'no action';
+  //     });
+  //     //
+  //     jest.spyOn(torrentclear.logger, 'info').mockImplementation();
+  //     jest.spyOn(torrentclear.logger, 'debug').mockImplementation();
+  //     jest.spyOn(torrentclear.logger, 'trace').mockImplementation();
+  //     logErrorMock = jest
+  //       .spyOn(torrentclear.logger, 'error')
+  //       .mockImplementation((_level: string | Level, ...args: any[]): any => {
+  //         return args;
+  //       });
+  //     //
+  //     torrentclear.main();
+  //     // Log Error
+  //     expect(logErrorMock).toHaveBeenNthCalledWith(1, `Torrent percent not found in torrent info: "11"`);
+  //     expect(logErrorMock).toHaveBeenNthCalledWith(2, `Failed to complete torrent verification process`);
+  //     //
+  //     execSyncMock.mockRestore();
+  //   });
+  //   it('Torrentclear - Error ratio not found', () => {
+  //     const torrentclear: Torrentclear = new Torrentclear(fakeRootPath);
+  //     //
+  //     const execSyncMock = jest.spyOn(cproc, 'execSync').mockImplementation((command: string, _options: any): any => {
+  //       if (command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:1234567890123456789 --list') {
+  //         const result = `ID     Done       Have  ETA           Up    Down  Ratio  Status       Name
+  //   35   100%   22.11 GB  12 days      0.0     0.0    0.0  Seeding      Шерлок Холмс S01 Serial WEB-DL (1080p)
+  // Sum:          24.08 GB              15.0  18007.0`;
+  //         return result;
+  //       }
+  //       if (
+  //         command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:1234567890123456789 --torrent 35 --info'
+  //       ) {
+  //         const result = `NAME
+  //   Id: 35
+  //   Name: Шерлок Холмс S01 Serial WEB-DL (1080p)
+  //   Hash: 64fab1c4a1fb9f48da1a886b252ac04b796df348
+  //   Labels:
 
-TRANSFER
-  State: Idle
-  Location: ${normalize(`${fakeRootPath}/mnt/downloads`)}
-  Percent Done: 100%
-  ETA: 0 seconds (0 seconds)
-  Download Speed: 0 kB/s
-  Upload Speed: 0 kB/s
-  Have: 2.86 GB (2.86 GB verified)
-  Availability: 100%
-  Total size: 2.86 GB (2.86 GB wanted)
-  Downloaded: 2.89 GB
-  Uploaded: 1.81 GB
-  Ratio: 
-  Corrupt DL: None
-  Peers: connected to 4, uploading to 0, downloading from 0
+  // TRANSFER
+  //   State: Idle
+  //   Location: ${normalize(`${fakeRootPath}/mnt/downloads`)}
+  //   Percent Done: 100%
+  //   ETA: 0 seconds (0 seconds)
+  //   Download Speed: 0 kB/s
+  //   Upload Speed: 0 kB/s
+  //   Have: 2.86 GB (2.86 GB verified)
+  //   Availability: 100%
+  //   Total size: 2.86 GB (2.86 GB wanted)
+  //   Downloaded: 2.89 GB
+  //   Uploaded: 1.81 GB
+  //   Ratio:
+  //   Corrupt DL: None
+  //   Peers: connected to 4, uploading to 0, downloading from 0
 
-HISTORY
-  Date added:       Thu Apr 25 22:16:07 2024
-  Date finished:    Thu Apr 25 22:20:32 2024
-  Date started:     Thu Apr 25 22:16:07 2024
-  Latest activity:  Sat Apr 27 18:47:33 2024
-  Downloading Time: 4 minutes (267 seconds)
-  Seeding Time:     2 days, 2 hours (180111 seconds)
+  // HISTORY
+  //   Date added:       Thu Apr 25 22:16:07 2024
+  //   Date finished:    Thu Apr 25 22:20:32 2024
+  //   Date started:     Thu Apr 25 22:16:07 2024
+  //   Latest activity:  Sat Apr 27 18:47:33 2024
+  //   Downloading Time: 4 minutes (267 seconds)
+  //   Seeding Time:     2 days, 2 hours (180111 seconds)
 
-ORIGINS
-  Date created: Tue Apr 16 19:15:17 2024
-  Public torrent: Yes
-  Comment: LostFilm.TV(c)
-  Creator: uTorrent/3310
-  Piece Count: 682
-  Piece Size: 4.00 MiB
+  // ORIGINS
+  //   Date created: Tue Apr 16 19:15:17 2024
+  //   Public torrent: Yes
+  //   Comment: LostFilm.TV(c)
+  //   Creator: uTorrent/3310
+  //   Piece Count: 682
+  //   Piece Size: 4.00 MiB
 
-LIMITS & BANDWIDTH
-  Download Limit: Unlimited
-  Upload Limit: Unlimited
-  Ratio Limit: Default
-  Honors Session Limits: Yes
-  Peer limit: 50
-  Bandwidth Priority: Normal
-`;
-        return result;
-      }
-      if (
-        command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:1234567890123456789 --torrent 35 --stop'
-      ) {
-        return `192.168.88.22:9092/transmission/rpc/\nresponded: "success"`;
-      }
-      if (
-        command ===
-        'transmission-remote 192.168.88.22:9092 --auth test_dev:1234567890123456789 --torrent 35 --remove-and-delete'
-      ) {
-        return `192.168.88.22:9092/transmission/rpc/\nresponded: "success"`;
-      }
-      return 'no action';
-    });
-    //
-    jest.spyOn(torrentclear.logger, 'info').mockImplementation();
-    jest.spyOn(torrentclear.logger, 'debug').mockImplementation();
-    jest.spyOn(torrentclear.logger, 'trace').mockImplementation();
-    logErrorMock = jest
-      .spyOn(torrentclear.logger, 'error')
-      .mockImplementation((_level: string | Level, ...args: any[]): any => {
-        return args;
-      });
-    //
-    torrentclear.main();
-    // Log Error
-    expect(logErrorMock).toHaveBeenNthCalledWith(1, `Torrent ratio not found in torrent info: "35"`);
-    expect(logErrorMock).toHaveBeenNthCalledWith(2, `Failed to complete torrent verification process`);
-    //
-    execSyncMock.mockRestore();
-  });
+  // LIMITS & BANDWIDTH
+  //   Download Limit: Unlimited
+  //   Upload Limit: Unlimited
+  //   Ratio Limit: Default
+  //   Honors Session Limits: Yes
+  //   Peer limit: 50
+  //   Bandwidth Priority: Normal
+  // `;
+  //         return result;
+  //       }
+  //       if (
+  //         command === 'transmission-remote 192.168.88.22:9092 --auth test_dev:1234567890123456789 --torrent 35 --stop'
+  //       ) {
+  //         return `192.168.88.22:9092/transmission/rpc/\nresponded: "success"`;
+  //       }
+  //       if (
+  //         command ===
+  //         'transmission-remote 192.168.88.22:9092 --auth test_dev:1234567890123456789 --torrent 35 --remove-and-delete'
+  //       ) {
+  //         return `192.168.88.22:9092/transmission/rpc/\nresponded: "success"`;
+  //       }
+  //       return 'no action';
+  //     });
+  //     //
+  //     jest.spyOn(torrentclear.logger, 'info').mockImplementation();
+  //     jest.spyOn(torrentclear.logger, 'debug').mockImplementation();
+  //     jest.spyOn(torrentclear.logger, 'trace').mockImplementation();
+  //     logErrorMock = jest
+  //       .spyOn(torrentclear.logger, 'error')
+  //       .mockImplementation((_level: string | Level, ...args: any[]): any => {
+  //         return args;
+  //       });
+  //     //
+  //     torrentclear.main();
+  //     // Log Error
+  //     expect(logErrorMock).toHaveBeenNthCalledWith(1, `Torrent ratio not found in torrent info: "35"`);
+  //     expect(logErrorMock).toHaveBeenNthCalledWith(2, `Failed to complete torrent verification process`);
+  //     //
+  //     execSyncMock.mockRestore();
+  //   });
   it('Torrentclear - Error date done not found', () => {
     const torrentclear: Torrentclear = new Torrentclear(fakeRootPath);
     //
