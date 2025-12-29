@@ -58,7 +58,7 @@
   торрент файлы.
 - v2.1.0 - (03.04.2023) Добавлено сохранение метрик после полного выполнения работы приложения.
 - v2.0.1 - (01.04.2023) Исправлена ошибка НЕ удаления торрента, если файл был удален ранее (к примеру из Plex).
-- v2.0.0 - (29.11.2022) Полностью заменен файл **torrentclear** с **bash** версии на **Node.js** версию. Изменена и
+- v2.0.0 - (29.11.2022) Полностью заменен файл `torrentclear` с `*.sh` версии на **Node.js** версию. Изменена и
   расширена логика обработки, улучшено логирование (уровни info, debug, etc) и многое другое.
 - v1.0.2 - (17.10.2022) Заменена команда запуска Python на `python3` т.к. в Debian 11 удалён python2.
 - v1.0.1 - (26.01.2021) Удален параметр CLEARFLAG т.к. не используется
@@ -81,7 +81,7 @@
 
 Достаточно поставить Node.js Команды для Proxmox LXC Debian 11.5 под root
 
-```shell
+```sh
 apt update && apt upgrade -y && apt install -y curl wget
 ```
 
@@ -89,7 +89,7 @@ apt update && apt upgrade -y && apt install -y curl wget
 Пойти в <https://github.com/nodesource/distributions/blob/master/README.md>  
 Выбрать LTS версию
 
-```shell
+```sh
 curl -fsSL https://deb.nodesource.com/setup_20.x -o nodesource_setup.sh
 bash nodesource_setup.sh
 apt update && apt install -y nodejs
@@ -99,7 +99,7 @@ v20.17.0
 
 Далее создаем папку под приложение, скачиваем файлы `index.js` и `package.json`. Делаем файл `index.js` исполняемым.
 
-```shell
+```sh
 mkdir /opt/torrentclear
 cd /opt/torrentclear
 wget -O index.js https://raw.githubusercontent.com/GregoryGost/transmission-torrentclear/refs/heads/main/dist/index.js
@@ -111,7 +111,7 @@ chmod +x index.js
 
 Создаем файл настроек и задаем свои параметры
 
-```shell
+```sh
 nano /opt/torrentclear/config.json
 ```
 
