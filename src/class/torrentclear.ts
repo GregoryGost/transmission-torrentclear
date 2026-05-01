@@ -42,7 +42,7 @@ class Torrentclear {
    * * Date finished (need trim)
    */
   private readonly regexTorrentInfo: RegExp =
-    /(?<=Name:\s)(.*?)(?=\s*Hash:)|(?<=State:\s)(.*?)(?=\s*Location:)|(?<=Location:\s)(.*?)(?=\s*Percent Done:)|(?<=Percent Done:\s)(.*?)%(?=\s*ETA:)|(?<=Ratio:\s)(.*?)(?=\s*Corrupt DL:)|(?<=Date finished:\s)(.*?)(?=\s*Date started:|$)/g;
+    /(?:Name:\s)(.*?)(?=\s*(?:Hash:|$))|(?:State:\s)(.*?)(?=\s*(?:Location:|$))|(?:Location:\s)(.*?)(?=\s*(?:Percent Done:|$))|(?:Percent Done:\s)(\d+(?:\.\d+)?)%?(?=\s*(?:ETA:|$))|(?:Ratio:\s)(\d+(?:\.\d+)?)(?=\s*(?:Corrupt DL:|$))|(?:Date finished:\s)(.*?)(?=\s*(?:Date started:|$))/gm;
   /**
    * ENUM for Check torrent is file or directory
    */
@@ -193,7 +193,7 @@ class Torrentclear {
       for (const torrentLine of resultTorrentsList) {
         this.logger.debug(`torrent: "${torrentLine.trim()}"`);
         const match: RegExpMatchArray | null = torrentLine.trim().match(/^(\d+).+$/i);
-        if (match !== null) {
+        if (match !== null && match.length > 0) {
           const id: string = match[1];
           this.logger.debug(`ID found: "${id}"`);
           this.torrentIDs.push(Number(id));
@@ -404,42 +404,38 @@ class Torrentclear {
    */
   private getTorrentInfo(id: number): void {
     try {
+      this.torrentInfo.id = id;
       const command = `${this.connect} --torrent ${id} --info`;
       this.logger.debug(`Run command: "${command}"`);
       const execResult: string = this.command(command);
       const matchAll: IterableIterator<RegExpMatchArray> = execResult.toString().matchAll(this.regexTorrentInfo);
       const matchArray: RegExpMatchArray[] = Array.from(matchAll);
       if (matchArray.length < 1) throw new Error(`Torrent info data is EMPTY`);
-      const torrentName: string = matchArray[0][1];
-      if (torrentName === undefined || torrentName === '')
-        throw new Error(`Torrent name not found in torrent info: "${id}"`);
-      const torrentState: string = matchArray[1][2];
-      if (torrentState === undefined || torrentState === '')
-        throw new Error(`Torrent state not found in torrent info: "${id}"`);
-      const torrentLocation: string = matchArray[2][3];
-      if (torrentLocation === undefined || torrentLocation === '')
-        throw new Error(`Torrent location not found in torrent info: "${id}"`);
-      const torrentPercent: string = matchArray[3][4];
-      if (torrentPercent === undefined || torrentPercent === '')
-        throw new Error(`Torrent percent not found in torrent info: "${id}"`);
-      const torrentRatio: string = matchArray[4][5];
-      if (torrentRatio === undefined || torrentRatio === '')
-        throw new Error(`Torrent ratio not found in torrent info: "${id}"`);
-      const torrentDateFinished: string = matchArray[5][6];
-      if (torrentDateFinished === undefined || torrentDateFinished === '')
-        throw new Error(`Torrent date done not found in torrent info: "${id}"`);
-      const nowDate: number = Date.now(); // ms
-      const parsedFinishDate: number = Date.parse(torrentDateFinished.trim()); // ms
-      this.torrentInfo = {
-        id: Number(id),
-        name: torrentName.trim(),
-        state: torrentState.trim(),
-        location: torrentLocation.trim(),
-        percent: Number(torrentPercent.trim()),
-        ratio: Number(torrentRatio.trim()),
-        dateDone: this.dateFormat(parsedFinishDate),
-        dateDifference: Math.round((nowDate - parsedFinishDate) / 1000) // ms => sec
-      };
+      for (const match of matchArray) {
+        const fullMatch: string = match[0];
+        if (fullMatch.startsWith('Name:')) {
+          if (match[1] !== '' && match[1] !== undefined) this.torrentInfo.name = match[1].trim();
+        } else if (fullMatch.startsWith('State:')) {
+          if (match[2] !== '' && match[2] !== undefined) this.torrentInfo.state = match[2].trim();
+        } else if (fullMatch.startsWith('Location:')) {
+          if (match[3] !== '' && match[3] !== undefined) this.torrentInfo.location = match[3].trim();
+        } else if (fullMatch.startsWith('Percent Done:')) {
+          if (match[4] !== '' && match[4] !== undefined) this.torrentInfo.percent = parseFloat(match[4].trim());
+        } else if (fullMatch.startsWith('Ratio:')) {
+          if (match[5] !== '' && match[5] !== undefined) this.torrentInfo.ratio = parseFloat(match[5].trim());
+        } else if (fullMatch.startsWith('Date finished:')) {
+          if (match[6] !== '' && match[6] !== undefined) {
+            const nowDate: number = Date.now(); // ms
+            const parsedFinishDate: number = Date.parse(match[6].trim()); // ms
+            this.torrentInfo.dateDone = this.dateFormat(parsedFinishDate);
+            this.torrentInfo.dateDifference = Math.round((nowDate - parsedFinishDate) / 1000); // ms => sec
+          }
+        }
+      }
+      if (this.torrentInfo.name === '') throw new Error(`Torrent name not found in torrent info: "${id}"`);
+      if (this.torrentInfo.state === '') throw new Error(`Torrent state not found in torrent info: "${id}"`);
+      if (this.torrentInfo.location === '') throw new Error(`Torrent location not found in torrent info: "${id}"`);
+      if (this.torrentInfo.dateDone === '') throw new Error(`Torrent date done not found in torrent info: "${id}"`);
       this.logger.debug(`Torrent ID "${this.torrentInfo.id}" info:`);
       this.logger.debug(`   Name: "${this.torrentInfo.name}"`);
       this.logger.debug(`   State: "${this.torrentInfo.state}"`);
@@ -449,6 +445,7 @@ class Torrentclear {
       this.logger.debug(`   Date finished: "${this.torrentInfo.dateDone}"`);
       this.logger.debug(`   Date Difference: "${this.torrentInfo.dateDifference}" | limit: "${this.config.limitTime}"`);
     } catch (error: unknown) {
+      // console.log(error);
       this.logger.trace(error);
       throw error;
     }

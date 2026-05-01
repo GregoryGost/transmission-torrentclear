@@ -197,10 +197,22 @@ class Config {
 
   /**
    * Get Ratio from `settings.json` transmission settings file
+   * Transmission 4 support new snake_case settings format.
+   * Transmission 5 snake_case settings is Default !!!
+   * * Doc: https://github.com/transmission/transmission/blob/main/docs/Editing-Configuration-Files.md
    */
   private setRatio(): void {
-    this.ratioEnabled = Boolean(this.getParam('ratio-limit-enabled'));
-    const ratioLimit: string = this.getParam('ratio-limit');
+    const trSaveVersionFormat: string | undefined = this.getUndefinedParam('TR_SAVE_VERSION_FORMAT');
+    // kebab-case
+    let ratioLimitEnableName = 'ratio-limit-enabled';
+    let ratioLimitName = 'ratio-limit';
+    // snake_case
+    if (trSaveVersionFormat !== undefined && Number(trSaveVersionFormat) >= 5) {
+      ratioLimitEnableName = 'ratio_limit_enabled';
+      ratioLimitName = 'ratio_limit';
+    }
+    this.ratioEnabled = Boolean(this.getParam(ratioLimitEnableName));
+    const ratioLimit: string = this.getParam(ratioLimitName);
     if (this.ratioEnabled) this.ratioLimit = parseFloat(ratioLimit);
   }
 
@@ -246,7 +258,7 @@ class Config {
    * @param {string} param_name - parameter name
    * @returns {string} parameter value
    */
-  getParam(param_name: string): string {
+  private getParam(param_name: string): string {
     // From config file. Example: login | log_level
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let param: any = this.nconf.get(param_name);
@@ -256,6 +268,22 @@ class Config {
     if (param === undefined || param === '')
       throw new Error(`Parameter "${param_name}" incorrect value "${param}" of type "${typeof param}"`);
     return String(param);
+  }
+
+  /**
+   * Get param value
+   * @param {string} param_name - parameter name
+   * @returns {string | undefined} parameter value
+   */
+  private getUndefinedParam(param_name: string): string | undefined {
+    // From config file. Example: login | log_level
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let param: any = this.nconf.get(param_name);
+    // Else not found from config file, get from Environment (uppercase).
+    // Example: LOGIN | LOG_LEVEL
+    if (param === undefined || param === '') param = this.nconf.get(param_name.toUpperCase());
+    if (param !== undefined) return String(param);
+    return param;
   }
 }
 
