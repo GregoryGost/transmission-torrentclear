@@ -115,3 +115,6 @@ config.json
 
 # Old files dir
 old/
+
+# AI
+.agent/
