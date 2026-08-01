@@ -118,3 +118,5 @@ old/
 
 # AI
 .agent/
+.agents/
+.codex/
