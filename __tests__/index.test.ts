@@ -10,7 +10,10 @@ let mainMock: jest.SpyInstance;
 describe('index.ts', () => {
   beforeEach(() => {
     mainMock = jest.spyOn(Torrentclear.prototype, 'main').mockImplementation();
-    jest.spyOn(Config.prototype, 'getParam').mockImplementation((param_name: string): string => {
+    const configPrototype = Config.prototype as unknown as {
+      getParam: (param_name: string) => string;
+    };
+    jest.spyOn(configPrototype, 'getParam').mockImplementation((param_name: string): string => {
       if (param_name === 'node_env') return 'production';
       if (param_name === 'log_level') return 'info';
       if (param_name === 'log_file_path') return '/var/log/transmission/torrentclear.log';
