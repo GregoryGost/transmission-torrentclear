@@ -207,12 +207,15 @@ Normalized form: Mon *-05~03 00:00:00
 
 ## Обновление
 
-Стоит обновить Node.js. Как пример обновление на 20 LTS версию.
+Для сборки из ветки `develop` требуется Node.js 26.12.1 или новее в пределах версии 26.x.
+Для ветки `main` используйте требования её `package.json`.
+Пример установки Node.js 26 на Debian от имени root:
 
 ```shell
-curl -fsSL https://deb.nodesource.com/setup_20.x -o nodesource_setup.sh
+curl -fsSL https://deb.nodesource.com/setup_26.x -o nodesource_setup.sh
 bash nodesource_setup.sh
-apt update && apt upgrade -y
+apt update && apt install -y nodejs
+node -v
 ```
 
 Для обновления можно просто перекачать файлы `index.js` и `package.json`
