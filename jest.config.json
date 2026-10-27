@@ -4,17 +4,9 @@
   "clearMocks": true,
   "resetMocks": true,
   "testEnvironment": "node",
-  "moduleFileExtensions": [
-    "js",
-    "ts"
-  ],
-  "testMatch": [
-    "**/*.test.ts"
-  ],
-  "testPathIgnorePatterns": [
-    "/node_modules/",
-    "/dist/"
-  ],
+  "moduleFileExtensions": ["js", "ts"],
+  "testMatch": ["**/*.test.ts"],
+  "testPathIgnorePatterns": ["/node_modules/", "/dist/"],
   "transform": {
     "^.+\\.ts$": [
       "ts-jest",
@@ -23,15 +15,9 @@
       }
     ]
   },
-  "coverageReporters": [
-    "json-summary",
-    "text",
-    "lcov"
-  ],
+  "coverageReporters": ["json-summary", "text", "lcov"],
   "collectCoverage": true,
-  "collectCoverageFrom": [
-    "./src/**"
-  ],
+  "collectCoverageFrom": ["./src/**"],
   "coverageThreshold": {
     "global": {
       "branches": 80,
